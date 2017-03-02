@@ -1,0 +1,48 @@
+<html>
+
+  <!-- HEAD -->
+  <head>
+    <title>SEPA Dashboard</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>   
+    <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css" />
+  </head>
+
+  <!-- BODY -->
+  <body>
+
+    <!-- toolbar -->
+    <div id='topToolbarContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
+      Configuration:<br>
+      <div id='topToolbarSection' style="width: 100%; padding: 10px; border-radius: 10px; margin: 5px;"></div>
+    </div>
+
+    <!-- namespace section -->
+    <div id='namespacesSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
+      Namespaces:<br>
+      <div id='namespacesSection' style="width: 100%; padding: 5px; height: 200px;"></div>
+    </div>
+
+    <!-- update/query/sub section -->
+    <div id='uqsSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
+      Primitives:<br>
+      <div id='uqsSection' style="width: 100%; padding: 5px; height: 350px;"></div>
+    </div>
+
+    <!-- results section -->
+    <div id='resultsSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
+      Results:</br>
+      <div id='resultsSection' style="width: 100%; padding: 5px; margin: 5px; height: 150px;">
+	<textarea id='resulttext' style="width: 100%; resize: none;" rows=10></textarea>
+      </div>
+    </div>
+    
+    <!-- bottom toolbar -->
+    <div id='bottomToolbarSection' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;"></div>
+    
+    <!-- the script -->
+    <script type="text/javascript" src="dashboard.js"></script>
+    
+  </body>
+  
+</html>
