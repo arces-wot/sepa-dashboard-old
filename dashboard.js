@@ -1,21 +1,33 @@
 $(function(){
 
-    var toolbarStyle = 'radius: 10px; padding: 5px;';
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // TOP TOOLBAR
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    var toolbarStyle = 'radius: 10px;';
 
     // toolbar
     $('#topToolbarSection').w2toolbar({
 	name: 'topToolbar',
 	items: [
 	    { type: 'html',  id: 'httpLabel',  html: 'HTTP host:&nbsp;' },
-	    { type: 'html', id: 'httpEntry', html: '<input type="text" name="httphost">' },
+	    { type: 'html', id: 'httpEntry', html: '<input type="text" id="httphostentry" name="httphost">' },
 	    { type: 'break' },
 	    { type: 'html',  id: 'wsLabel',  html: 'WebSocket host:&nbsp;' },
-	    { type: 'html', id: 'wsEntry', html: '<input type="text" name="wshost">' },
+	    { type: 'html', id: 'wsEntry', html: '<input type="text" id="wshostentry" name="wshost">' },
 	    { type: 'break' },
 	    { type: 'button', id: 'connectButton', text: 'Connect/Disconnect'},
 	    { type: 'button', id: 'loadSapButton', text: 'Load SAP file'}
 	]
     });    
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // NAMESPACE LAYOUT
+    //
+    ////////////////////////////////////////////////////////////////////////////////
 
     // namespaces section
     $('#namespacesSection').w2layout({
@@ -50,28 +62,88 @@ $(function(){
     });
     w2ui['nsLayout'].content('right', w2ui['nsForm']);
 
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // UPDATE/QUERY/SUBSCRIBE LAYOUT
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    
     // uqs section
     $('#uqsSection').w2layout({
         name: 'uqsLayout',
-	style: toolbarStyle,
+	style: 'radius: 10px; padding: 5px; height: 370px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },	    
         ]
     });
-
-    // update section
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // UPDATE/QUERY LAYOUT
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    // update layout
     $().w2layout({
         name: 'updateLayout',
-	style: toolbarStyle,
+	style: 'border-radius: 10px; padding: 5px; height: 350px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
-	    { type: 'bottom', size: '50%', content: 'bottom', style: 'margin: 5px; border-style: none;' },
+	    { type: 'bottom', size: '50%', content: '<div id="uForm"></div>', style: 'margin: 5px; border-style: none;' },
         ]
-    });
+    });   
     w2ui['uqsLayout'].content('left', w2ui['updateLayout']);
 
+    // updateForm
+    updateForm = "<div id='updateForm' style='width: 750px;'>" +
+	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field'>" +
+        "<label>Text:</label>" +
+	"<div>" +
+        "<textarea name='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea>" +
+        "</div></div></div>" +
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='update'>Update</button>" +
+        "<button class='w2ui-btn' name='query'>Query</button>" +
+	"</div></div>"    
+    $().w2form({
+	name: 'uForm',
+	formHTML: updateForm,
+	fields: [
+	    { name: 'updateQueryText',
+	      type: 'text'}	    
+	],
+	actions: {
+	    update: function(){
+
+		// get the HTTP host
+		httpHost = $('#httphostentry').val();
+		
+		// sparql update
+		updateQuery = $('#updateQueryText').val();
+		console.log(updateQuery);
+
+		// do an HTTP POST request
+		$.ajax({
+		    url: httpHost,
+		    method: 'POST',
+		    contentType: "application/sparql-update",
+		    async: false,
+		    data: updateQuery,
+		    complete: function(data) {
+			console.log(data);
+		    }
+		});
+		
+	    },
+	    query: function(){}
+	}
+    });
+    w2ui['updateLayout'].content('bottom', w2ui['uForm']);
+    
     // updates list
     $().w2grid({	
 	name: 'uGrid',	
@@ -92,55 +164,56 @@ $(function(){
     });
     w2ui['updateLayout'].content('right', w2ui['ufbGrid']);
 
-    // update form
-    $('#uqForm').w2form({
-        name  : 'uForm',
-        fields: [
-    	    { field: 'uqtext',  type: 'textarea', name: 'Update/query:' },
-        ],
-	actions: {
-            'SPARQL Update': function (event)  {},
-            'SPARQL Query': function (event) {}
-        }
-    });
-    w2ui['updateLayout'].content('bottom', w2ui['uForm']);
-
-    // subscribe section
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // SUBSCRIBE LAYOUT
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    // subscribe layout
     $().w2layout({
         name: 'subscribeLayout',
-	style: toolbarStyle,
+	style: 'border-radius: 10px; padding: 5px; height: 350px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
-	    { type: 'bottom', size: '50%', content: 'bottom', style: 'margin: 5px; border-style: none' },
+	    { type: 'bottom', size: '50%', content: '<div id="sForm"></div>', style: 'margin: 5px; border-style: none;' },
         ]
-    });
+    });   
     w2ui['uqsLayout'].content('right', w2ui['subscribeLayout']);
 
-    // subscribe form
+    // subscribeForm
+    subscribeForm = "<div id='subscribeForm' style='width: 750px;'>" +
+	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field'>" +
+        "<label>Text:</label>" +
+	"<div>" +
+        "<textarea name='subText' type='text' style='width: 385px; height: 80px; resize: none'></textarea>" +
+        "</div></div></div>" +
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='subscribe'>Subscribe</button>" +
+        "<button class='w2ui-btn' name='unsubscribe'>Unsubscribe</button>" +
+	"</div></div>"    
     $().w2form({
-        name  : 'sForm',
-        fields: [
-    	    { field: 'stext', type: 'textarea', name: 'Subscription:' },
-        ],
-	actions: {
-            'SPARQL Subscribe': function (event) {},
-            'SPARQL Unsubscribe': function (event) {}
-        }
+	name: 'sForm',
+	formHTML: subscribeForm,
+	fields: [
+	    { name: 'subText',
+	      type: 'text'}	    
+	]
     });
     w2ui['subscribeLayout'].content('bottom', w2ui['sForm']);
-
-
-    // subscription list
+    
+    // updates list
     $().w2grid({	
 	name: 'sGrid',	
 	columns: [
-	    { field: 'subscription', caption: 'SPARQL Subscription', size: '100%' },
+	    { field: 'subscribe', caption: 'SPARQL Subscription', size: '100%' },
 	]
     });
     w2ui['subscribeLayout'].content('left', w2ui['sGrid']);
 
-    // subscribe forced bindings grid
+    // update forced bindings grid
     $().w2grid({	
 	name: 'sfbGrid',	
 	columns: [
@@ -149,8 +222,14 @@ $(function(){
 	    { field: 'sliteral', caption: 'Literal', size: '30%' }
 	]
     });
-    w2ui['subscribeLayout'].content('right', w2ui['sfbGrid']);
+    w2ui['subscribeLayout'].content('right', w2ui['sfbGrid']);    
 
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // BOTTOM TOOLBAR
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    
     // bottom toolbar
     $('#bottomToolbarSection').w2toolbar({
 	name: 'bottomToolbar',
@@ -158,5 +237,6 @@ $(function(){
 	    { type: 'button', id: 'clearButton', text: 'Clear'}
 	]
     });    
+
     
 });
