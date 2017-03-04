@@ -13,7 +13,7 @@ $(function(){
 	name: 'topToolbar',
 	items: [
 	    { type: 'html',  id: 'httpLabel',  html: 'HTTP host:&nbsp;' },
-	    { type: 'html', id: 'httpEntry', html: '<input type="text" id="httphostentry" name="httphost">' },
+	    { type: 'html', id: 'httpEntry', html: '<input type="text" id="httphostentry" name="httphost" value="http://localhost:8000/sparql">' },
 	    { type: 'break' },
 	    { type: 'html',  id: 'wsLabel',  html: 'WebSocket host:&nbsp;' },
 	    { type: 'html', id: 'wsEntry', html: '<input type="text" id="wshostentry" name="wshost">' },
@@ -119,6 +119,9 @@ $(function(){
 	actions: {
 	    update: function(){
 
+		// console log
+		console.log("Performing a SPARQL UPDATE request");
+
 		// get the HTTP host
 		httpHost = $('#httphostentry').val();
 		
@@ -127,15 +130,16 @@ $(function(){
 		console.log(updateQuery);
 
 		// do an HTTP POST request
-		$.ajax({
+		var req = $.ajax({
 		    url: httpHost,
 		    method: 'POST',
 		    contentType: "application/sparql-update",
-		    async: false,
 		    data: updateQuery,
-		    complete: function(data) {
-			console.log(data);
-		    }
+		    dataType: 'text',
+		    complete: function(xhr, msg){
+			console.log(xhr)
+			console.log(msg);			
+		    },
 		});
 		
 	    },
