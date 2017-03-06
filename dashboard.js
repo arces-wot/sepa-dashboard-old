@@ -170,8 +170,8 @@ $(function(){
 
 			    // retrieve prefix and namespace
 			    url = $(this).attr('url');
-			    httpport = $(this).attr('updateport');
-			    wsport = $(this).attr('subscribeport');
+			    httpport = $(this).attr('updatePort');
+			    wsport = $(this).attr('subscribePort');
 			    path = $(this).attr('path');
 			    
 			    // build http url
