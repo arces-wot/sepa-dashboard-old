@@ -35,7 +35,7 @@ $(function(){
 	style: toolbarStyle,
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
-            { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
+            { type: 'right', size: '50%', content: '<div id="nsForm"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
         ]
     });
    
@@ -43,24 +43,57 @@ $(function(){
     $().w2grid({	
 	name: 'nsGrid',	
 	columns: [
-	    { field: 'prefix', caption: 'Prefix', size: '30%' },
-	    { field: 'namespace', caption: 'Namespace', size: '70%' }
+	    { field: 'prefix', caption: 'Prefix', size: '20%' },
+	    { field: 'namespace', caption: 'Namespace', size: '80%' }
 	]
     });
     w2ui['nsLayout'].content('left', w2ui['nsGrid']);
 
+    // namespace html form
+    nsFormHtml = "<div id='nsForm' style='width: 100%;'>" +
+	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field'><label>Prefix:</label>" +
+	"<div><input name='prefixEntry' type='text' style='width: 385px; height: 80px; resize: none'></div></div>" +
+        "<div class='w2ui-field'><label>Namespace:</label>" +
+	"<div><input name='namespaceEntry' type='text' style='width: 385px; height: 80px; resize: none'></div></div>" +
+	"</div>" + 
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='update'>Add</button>" +
+        "<button class='w2ui-btn' name='query'>Delete</button>" +
+	"</div></div>"    
+
     // namespaces form    
-    $().w2form({ 
-        name  : 'nsForm',
+    $('#nsForm').w2form({ 
+        name  : 'nsFormJs',
+	style: 'height: 100%',	
+	formHtml : nsFormHtml,
         fields: [
-    	    { field: 'Prefix', type: 'text' },
-    	    { field: 'Namespace',  type: 'text' },
+    	    { field: 'prefixEntry', type: 'text', name: 'Prefix'},
+    	    { field: 'namespaceEntry',  type: 'text', name: 'Namespace' },
         ],
         actions: {
-            'Add prefix': function (event) {}
+            'Add': function (event) {
+
+		// get the current number of items in the grid
+		var g = w2ui['nsGrid'].records.length;	
+
+		// retrieve prefix and namespace
+		var p = $('#Prefix').val();		
+		var n = $('#Namespace').val();
+
+		// add the element to the grid
+		w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
+	    },	    
+	    'Delete': function (event) {
+
+		// get the selected indices
+		var s = w2ui['nsGrid'].getSelection();
+
+		// remove
+		w2ui['nsGrid'].remove(s);
+	    }
         }
     });
-    w2ui['nsLayout'].content('right', w2ui['nsForm']);
 
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -132,14 +165,16 @@ $(function(){
 		// do an HTTP POST request
 		var req = $.ajax({
 		    url: httpHost,
+		    crossOrigin: true,
 		    method: 'POST',
 		    contentType: "application/sparql-update",
-		    data: updateQuery,
-		    dataType: 'text',
-		    complete: function(xhr, msg){
-			console.log(xhr)
-			console.log(msg);			
-		    },
+		    data: updateQuery,	
+		    statusCode: {
+			200: function(){
+			    console.log("200 OK - Request Successful");
+			    $('#resulttext').val("200 OK - Request Successful");
+			}
+		    }
 		});
 		
 	    },
