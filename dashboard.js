@@ -248,7 +248,7 @@ $(function(){
 	    $('#Namespace').val(nsItem["namespace"]);	    
 
 	    // debug
-	    log("DEBUG", "Selected prefix " + nsItem["prefix"] + "(namespace " + nsItem["namespace"] + ")");
+	    log("INFO", "Selected prefix " + nsItem["prefix"] + "(namespace " + nsItem["namespace"] + ")");
 
 	}
     });
