@@ -11,12 +11,27 @@
   <!-- BODY -->
   <body>
 
-    <!-- toolbar -->
-    <div id='topToolbarContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
+    <!-- topToolbar section -->
+    <div id='topToolbarSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
       Configuration:<br/>
-      <div id='topToolbarSection' style="width: 100%; padding: 10px; border-radius: 10px; margin: 5px;"></div>
-    </div>
+	<div id="sapForm" style="width: 100%;">
+	  <div class="w2ui-page page-0">
+            <div class="w2ui-field">
+              <label>Load SAP File:</label>
+              <div>
+                <input id="sapFile" type="file"/>
+              </div>
+            </div><!-- w2ui-field -->
+	  </div><!-- w2ui-page -->
+	  
+	  <div class="w2ui-buttons">
+            <button class="w2ui-btn" name="loadSapBtn">Load</button>
+            <button class="w2ui-btn" name="clearBtn">Clear</button>
+	  </div><!-- w2ui-buttons -->
 
+	</div><!-- sapForm -->
+    </div><!-- topToolbarSectionContainer -->
+    
     <!-- namespace section -->
     <div id='namespacesSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
       Namespaces:<br/>
@@ -33,9 +48,6 @@
 	<textarea id='resulttext' style="width: 100%; resize: none;"></textarea>
       </div>
     </div>
-
-    <!-- bottom toolbar -->
-    <div id='bottomToolbarSection' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;"></div>   
 
     <!-- the script -->
     <script type="text/javascript" src="dashboard.js"></script>

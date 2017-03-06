@@ -8,20 +8,193 @@ $(function(){
     
     var toolbarStyle = 'radius: 10px;';
 
-    // toolbar
-    $('#topToolbarSection').w2toolbar({
-	name: 'topToolbar',
-	items: [
-	    { type: 'html',  id: 'httpLabel',  html: 'HTTP host:&nbsp;' },
-	    { type: 'html', id: 'httpEntry', html: '<input type="text" id="httphostentry" name="httphost" value="http://localhost:8000/sparql">' },
-	    { type: 'break' },
-	    { type: 'html',  id: 'wsLabel',  html: 'WebSocket host:&nbsp;' },
-	    { type: 'html', id: 'wsEntry', html: '<input type="text" id="wshostentry" name="wshost">' },
-	    { type: 'break' },
-	    { type: 'button', id: 'connectButton', text: 'Connect/Disconnect'},
-	    { type: 'button', id: 'loadSapButton', text: 'Load SAP file'}
-	]
-    });    
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // CONFIGURATION LAYOUT
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    $('#sapForm').w2form({
+        name  : 'sapFormJs',
+	style: "margin: 5px;",
+        fields: [
+    	    { field: 'sapFile', type: 'file' },
+        ],
+        actions: {
+	    clearBtn: function(event){
+
+		// clear the namespaces grid
+		w2ui['nsGrid'].clear();
+
+		// clear the namespace and prefix text entries
+		$('#Prefix').val("");		
+		$('#Namespace').val("");
+
+		// clear the update/query grid
+		w2ui['uGrid'].clear();
+
+		// clear the update/query forced bindings grid
+		w2ui['ufbGrid'].clear();
+
+		// clear the update/query form
+		$('#updateQueryHost').val("");
+		$('#updateQueryText').val("");
+
+		// clear the update/query grid
+		w2ui['sGrid'].clear();
+
+		// clear the update/query forced bindings grid
+		w2ui['sfbGrid'].clear();
+
+		// clear the update/query form
+		$('#subscribeHost').val("");
+		$('#subText').val("");
+
+		// clear the results area
+		$('#resulttext').val("");
+
+	    },
+            loadSapBtn: function (event) {
+
+		// check if file reader is supported
+		if ( ! window.FileReader ) {
+		    console.log( 'FileReader API is not supported by your browser.' );
+		    return false;
+		}
+		else {
+		    console.log('FileReader API supported!');
+		}
+
+		// load data
+		var $i = $( '#sapFile' );		
+		input = $i[0];
+		if ( input.files && input.files[0] ) {
+		    file = input.files[0];
+
+		    // create a mew instance of the file reader
+		    fr = new FileReader();		    
+		    var text;
+		    fr.onload = function () {
+
+			$('#resulttext').val(fr.result);
+			var decodedData = fr.result;
+			
+			// parse the XML
+			xmlDoc = $.parseXML(decodedData);
+			$xml = $(xmlDoc);
+			
+			// namespaces
+			$xml.find("namespace").each(function(){
+
+			    // retrieve prefix and namespace
+			    p = $(this).attr('prefix');
+			    n = $(this).attr('suffix');
+
+			    // get the current number of items in the grid
+			    var g = w2ui['nsGrid'].records.length;	
+
+			    // add the element to the grid
+			    w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
+			});
+			
+			// retrieve subscriptions
+			$xml.find("subscribe").each(function(){
+			    
+			    // retrieve the update
+			    var sname = $(this).attr("id");
+
+			    // get the subscription text
+			    var stext = $(this).find("sparql").text();
+
+			    // retrieve the forced bindings
+			    var fbindings = [];
+			    $(this).find("binding").each(function(){
+				fbindings.push({"variable":$(this).attr("variable"), "value":$(this).attr("value"), "type":$(this).attr("type")}) ;
+			    });
+
+			    // get the current number of items in the grid
+			    var g = w2ui['sGrid'].records.length;	
+
+			    // add the element to the grid
+			    w2ui['sGrid'].add({recid: g+1, subscribe: sname, forcedBindings: JSON.stringify(fbindings), subscribeText: stext });
+
+			});
+
+			// retrieve updates
+			$xml.find("update").each(function(){
+			    
+			    // retrieve the update
+			    var uname = $(this).attr("id");
+
+			    // get the update text
+			    var utext = $(this).find("sparql").text();
+
+			    // retrieve the forced bindings
+			    var fbindings = [];
+			    $(this).find("binding").each(function(){
+				fbindings.push({"variable":$(this).attr("variable"), "value":$(this).attr("value"), "type":$(this).attr("type")}) ;
+			    });
+
+			    // get the current number of items in the grid
+			    var g = w2ui['uGrid'].records.length;	
+
+			    // add the element to the grid
+			    w2ui['uGrid'].add({recid: g+1, updateName: uname, forcedBindings: JSON.stringify(fbindings), updateText: utext });
+
+			});			
+
+			// retrieve queries
+			$xml.find("query").each(function(){
+			    
+			    // retrieve the query
+			    var uname = $(this).attr("id");
+
+			    // get the update text
+			    var utext = $(this).find("sparql").text();
+
+			    // retrieve the forced bindings
+			    var fbindings = [];
+			    $(this).find("binding").each(function(){
+				fbindings.push({"variable":$(this).attr("variable"), "value":$(this).attr("value"), "type":$(this).attr("type")}) ;
+			    });
+
+			    // get the current number of items in the grid
+			    var g = w2ui['uGrid'].records.length;	
+
+			    // add the element to the grid
+			    w2ui['uGrid'].add({recid: g+1, update: uname, forcedBindings: JSON.stringify(fbindings), updateText: utext });
+
+			});
+
+			// retrieve sepa host		   
+			$xml.find("parameters").each(function(){
+
+			    // retrieve prefix and namespace
+			    url = $(this).attr('url');
+			    httpport = $(this).attr('updateport');
+			    wsport = $(this).attr('subscribeport');
+			    path = $(this).attr('path');
+			    
+			    // build http url
+			    httpUrl = "http://" + url + ":" + httpport + path;
+			    $('#updateQueryHost').val(httpUrl);
+
+			    // build ws url
+			    wsUrl = "ws://" + url + ":" + wsport + path;
+			    $('#subscribeHost').val(wsUrl);
+
+			    
+			});
+
+		    };
+		    fr.readAsText(file);
+
+		} else {
+		    // Handle errors here
+		    alert( "File not selected or browser incompatible." )
+		}
+	    }	    
+        }
+    });
 
     ////////////////////////////////////////////////////////////////////////////////
     //
@@ -45,7 +218,15 @@ $(function(){
 	columns: [
 	    { field: 'prefix', caption: 'Prefix', size: '20%' },
 	    { field: 'namespace', caption: 'Namespace', size: '80%' }
-	]
+	],
+	onClick: function(event){
+
+	    // retrieve the namespace
+	    nsItem = w2ui['nsGrid'].get(event["recid"]);
+
+	    $('#Prefix').val(nsItem["prefix"]);		
+	    $('#Namespace').val(nsItem["namespace"]);	    
+	}
     });
     w2ui['nsLayout'].content('left', w2ui['nsGrid']);
 
@@ -74,15 +255,16 @@ $(function(){
         actions: {
             'Add': function (event) {
 
-		// get the current number of items in the grid
-		var g = w2ui['nsGrid'].records.length;	
-
 		// retrieve prefix and namespace
 		var p = $('#Prefix').val();		
 		var n = $('#Namespace').val();
 
+		// get the current number of items in the grid
+		var g = w2ui['nsGrid'].records.length;	
+
 		// add the element to the grid
 		w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
+
 	    },	    
 	    'Delete': function (event) {
 
@@ -91,6 +273,12 @@ $(function(){
 
 		// remove
 		w2ui['nsGrid'].remove(s);
+
+		// clear fields
+		$('#Prefix').val("");		
+		$('#Namespace').val("");
+
+
 	    }
         }
     });
@@ -105,7 +293,7 @@ $(function(){
     // uqs section
     $('#uqsSection').w2layout({
         name: 'uqsLayout',
-	style: 'radius: 10px; padding: 5px; height: 370px;',
+	style: 'radius: 10px; padding: 5px; height: 450px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },	    
@@ -121,7 +309,7 @@ $(function(){
     // update layout
     $().w2layout({
         name: 'updateLayout',
-	style: 'border-radius: 10px; padding: 5px; height: 350px;',
+	style: 'border-radius: 10px; padding: 5px; 100%;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
@@ -133,21 +321,22 @@ $(function(){
     // updateForm
     updateForm = "<div id='updateForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field'>" +
-        "<label>Text:</label>" +
-	"<div>" +
-        "<textarea name='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea>" +
-        "</div></div></div>" +
+        "<div class='w2ui-field'><label>HTTP Host:</label><div>" +
+        "<input type='text' value='http://localhost:8000/sparql' id='updateQueryHost' style='width: 385px;'></div></div>" +
+        "<div class='w2ui-field'><label>Text:</label><div>" +
+        "<textarea id='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
+        "</div>" +
 	"<div class='w2ui-buttons'>" +
         "<button class='w2ui-btn' name='update'>Update</button>" +
         "<button class='w2ui-btn' name='query'>Query</button>" +
 	"</div></div>"    
+
     $().w2form({
 	name: 'uForm',
 	formHTML: updateForm,
 	fields: [
-	    { name: 'updateQueryText',
-	      type: 'text'}	    
+	    { name: 'updateQueryHost', type: 'text' },
+	    { name: 'updateQueryText', type: 'text'}	    
 	],
 	actions: {
 	    update: function(){
@@ -156,11 +345,10 @@ $(function(){
 		console.log("Performing a SPARQL UPDATE request");
 
 		// get the HTTP host
-		httpHost = $('#httphostentry').val();
+		httpHost = $('#updateQueryHost').val();
 		
 		// sparql update
 		updateQuery = $('#updateQueryText').val();
-		console.log(updateQuery);
 
 		// do an HTTP POST request
 		var req = $.ajax({
@@ -171,7 +359,6 @@ $(function(){
 		    data: updateQuery,	
 		    statusCode: {
 			200: function(){
-			    console.log("200 OK - Request Successful");
 			    $('#resulttext').val("200 OK - Request Successful");
 			}
 		    }
@@ -187,8 +374,29 @@ $(function(){
     $().w2grid({	
 	name: 'uGrid',	
 	columns: [
-	    { field: 'update', caption: 'SPARQL Update/Query', size: '100%' },
-	]
+	    { field: 'updateName', caption: 'SPARQL Update/Query', size: '30%' },
+	    { field: 'forcedBindings', caption: 'Forced variables', size: '70%' },
+	    { field: 'updateText', hidden: true }
+	],
+	onClick: function(event){
+
+	    // retrieve the event
+	    uqItem = w2ui['uGrid'].get(event["recid"]);
+
+	    // clear the forced bindings grid	    
+	    w2ui['ufbGrid'].clear();
+
+	    // fill
+	    var g = w2ui['ufbGrid'].records.length;	
+	    bindings = JSON.parse(uqItem["forcedBindings"]);
+	    bindings.forEach(function(element){
+	    	w2ui['ufbGrid'].add({recid: g+1, uvariable: element["variable"], uliteral: element["type"], uvalue: element["value"]});		
+	    });
+
+	    // fill the text area
+	    $('#updateQueryText').val(uqItem["updateText"]);
+
+	}
     });
     w2ui['updateLayout'].content('left', w2ui['uGrid']);
 
@@ -212,7 +420,7 @@ $(function(){
     // subscribe layout
     $().w2layout({
         name: 'subscribeLayout',
-	style: 'border-radius: 10px; padding: 5px; height: 350px;',
+	style: 'border-radius: 10px; padding: 5px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
@@ -224,6 +432,8 @@ $(function(){
     // subscribeForm
     subscribeForm = "<div id='subscribeForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field'><label>WS Host:</label><div>" +
+        "<input type='text' value='ws://localhost:9000/sparql' id='subscribeHost' style='width: 385px;'></div></div>" +
         "<div class='w2ui-field'>" +
         "<label>Text:</label>" +
 	"<div>" +
@@ -237,22 +447,43 @@ $(function(){
 	name: 'sForm',
 	formHTML: subscribeForm,
 	fields: [
-	    { name: 'subText',
-	      type: 'text'}	    
+	    { name: 'subscribeHost', type: 'text'},
+	    { name: 'subText', type: 'text'} 
 	]
     });
     w2ui['subscribeLayout'].content('bottom', w2ui['sForm']);
     
-    // updates list
+    // subscriptions list
     $().w2grid({	
 	name: 'sGrid',	
 	columns: [
-	    { field: 'subscribe', caption: 'SPARQL Subscription', size: '100%' },
-	]
+	    { field: 'subscribe', caption: 'SPARQL Subscription', size: '30%' },
+	    { field: 'forcedBindings', caption: 'Forced variables', size: '70%' },
+	    { field: 'subscribeText', hidden: true },
+	],
+	onClick: function(event){
+
+	    // retrieve the event
+	    sItem = w2ui['sGrid'].get(event["recid"]);
+
+	    // clear the forced bindings grid	    
+	    w2ui['sfbGrid'].clear();
+
+	    // fill
+	    var g = w2ui['sfbGrid'].records.length;	
+	    bindings = JSON.parse(sItem["forcedBindings"]);
+	    bindings.forEach(function(element){
+	    	w2ui['sfbGrid'].add({recid: g+1, svariable: element["variable"], sliteral: element["type"], svalue: element["value"]});		
+	    });
+
+	    // fill the text area
+	    $('#subText').val(sItem["subscribeText"]);
+
+	}
     });
     w2ui['subscribeLayout'].content('left', w2ui['sGrid']);
 
-    // update forced bindings grid
+    // subscriptions forced bindings grid
     $().w2grid({	
 	name: 'sfbGrid',	
 	columns: [
@@ -262,20 +493,5 @@ $(function(){
 	]
     });
     w2ui['subscribeLayout'].content('right', w2ui['sfbGrid']);    
-
-    ////////////////////////////////////////////////////////////////////////////////
-    //
-    // BOTTOM TOOLBAR
-    //
-    ////////////////////////////////////////////////////////////////////////////////
-    
-    // bottom toolbar
-    $('#bottomToolbarSection').w2toolbar({
-	name: 'bottomToolbar',
-	items: [
-	    { type: 'button', id: 'clearButton', text: 'Clear'}
-	]
-    });    
-
     
 });
