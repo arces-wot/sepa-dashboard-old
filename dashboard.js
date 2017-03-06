@@ -2,17 +2,26 @@ $(function(){
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    // TOP TOOLBAR
+    // LOG FUNCTION
     //
     ////////////////////////////////////////////////////////////////////////////////
+
+    function log(level, text){
     
-    var toolbarStyle = 'radius: 10px;';
+	t = new Date();
+	$("#debugText").empty();
+	$("#debugText").text("[" + t.toTimeString() + "][" + level + "] " + text);
+
+    };   
 
     ////////////////////////////////////////////////////////////////////////////////
     //
     // CONFIGURATION LAYOUT
     //
     ////////////////////////////////////////////////////////////////////////////////
+
+    var toolbarStyle = 'radius: 10px;';
+
     $('#sapForm').w2form({
         name  : 'sapFormJs',
 	style: "margin: 5px;",
@@ -52,16 +61,20 @@ $(function(){
 		// clear the results area
 		$('#resulttext').val("");
 
+		// clear debug area
+		$("#debugText").empty();
+
+		// debug
+		log("INFO", "Cleaning completed!");
+
 	    },
             loadSapBtn: function (event) {
 
 		// check if file reader is supported
 		if ( ! window.FileReader ) {
-		    console.log( 'FileReader API is not supported by your browser.' );
+		    alarm( 'FileReader API is not supported by your browser.' );
+		    log("ERROR", 'FileReader API is not supported by your browser.' );
 		    return false;
-		}
-		else {
-		    console.log('FileReader API supported!');
 		}
 
 		// load data
@@ -188,9 +201,13 @@ $(function(){
 		    };
 		    fr.readAsText(file);
 
+		    // debug
+		    log("INFO", "File parsing completed!");
+		    
 		} else {
 		    // Handle errors here
-		    alert( "File not selected or browser incompatible." )
+		    alert("File not selected or browser incompatible.");
+		    log("ERROR", "File not selected or browser incompatible.");
 		}
 	    }	    
         }
@@ -224,8 +241,13 @@ $(function(){
 	    // retrieve the namespace
 	    nsItem = w2ui['nsGrid'].get(event["recid"]);
 
+	    // fill fields on the right
 	    $('#Prefix').val(nsItem["prefix"]);		
 	    $('#Namespace').val(nsItem["namespace"]);	    
+
+	    // debug
+	    log("DEBUG", "Selected prefix " + nsItem["prefix"] + "(namespace " + nsItem["namespace"] + ")");
+
 	}
     });
     w2ui['nsLayout'].content('left', w2ui['nsGrid']);
@@ -265,6 +287,9 @@ $(function(){
 		// add the element to the grid
 		w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
 
+		// debug
+		log("INFO", "Added prefix " + p + " (" + n + ")");
+		
 	    },	    
 	    'Delete': function (event) {
 
@@ -274,11 +299,16 @@ $(function(){
 		// remove
 		w2ui['nsGrid'].remove(s);
 
-		// clear fields
+		// retrieve prefix and namespace
+		var p = $('#Prefix').val();		
+		var n = $('#Namespace').val();
+
+		// clear fields		
 		$('#Prefix').val("");		
 		$('#Namespace').val("");
 
-
+		// debug
+		log("INFO", "Deleted prefix " + p + " (" + n + ")");
 	    }
         }
     });
@@ -341,9 +371,6 @@ $(function(){
 	actions: {
 	    update: function(){
 
-		// console log
-		console.log("Performing a SPARQL UPDATE request");
-
 		// get the HTTP host
 		httpHost = $('#updateQueryHost').val();
 		
@@ -359,13 +386,15 @@ $(function(){
 		    data: updateQuery,	
 		    statusCode: {
 			200: function(){
-			    $('#resulttext').val("200 OK - Request Successful");
+			    log("INFO", "UPDATE Request Successful (200 OK)");
 			}
 		    }
 		});
-		
+
 	    },
-	    query: function(){}
+	    query: function(){
+		log("WARNING", "QUERY yet to implement!");
+	    }
 	}
     });
     w2ui['updateLayout'].content('bottom', w2ui['uForm']);
@@ -395,6 +424,9 @@ $(function(){
 
 	    // fill the text area
 	    $('#updateQueryText').val(uqItem["updateText"]);
+
+	    // debug
+	    log("INFO", "Selected update/query " + uqItem["updateName"]);
 
 	}
     });
@@ -479,6 +511,9 @@ $(function(){
 	    // fill the text area
 	    $('#subText').val(sItem["subscribeText"]);
 
+	    // debug
+	    log("INFO", "Selected subscription " + sItem["subscribe"]);
+	    
 	}
     });
     w2ui['subscribeLayout'].content('left', w2ui['sGrid']);
