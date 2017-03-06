@@ -421,6 +421,7 @@ $(function(){
 	    var g = w2ui['ufbGrid'].records.length;	
 	    bindings = JSON.parse(uqItem["forcedBindings"]);
 	    bindings.forEach(function(element){
+		g = g+1;
 	    	w2ui['ufbGrid'].add({recid: g+1, uvariable: element["variable"], uliteral: element["type"], uvalue: element["value"]});		
 	    });
 
@@ -439,9 +440,48 @@ $(function(){
 	name: 'ufbGrid',	
 	columns: [
 	    { field: 'uvariable', caption: 'Variable', size: '35%' },
-	    { field: 'uvalue', caption: 'Value', size: '35%' },
+	    { field: 'uvalue', caption: 'Value', size: '35%', editable: {type:'text'} },
 	    { field: 'uliteral', caption: 'Literal', size: '30%' }
-	]
+	],
+	onChange: function(event){
+
+	    // get the new value
+	    new_value = event.value_new;
+
+	    // get the modified variable
+	    modified_variable = w2ui['ufbGrid'].get(event["recid"])["uvariable"];
+
+	    // retrieve the original query
+	    uqItem = w2ui['uGrid'].get(w2ui['uGrid'].getSelection())[0];
+	    leftrecid = uqItem["recid"];
+	    original_query = uqItem["updateText"];
+	    var query = original_query;
+
+	    // update its field
+	    new_uqItem = uqItem;	    
+	    bindings = JSON.parse(uqItem["forcedBindings"]);
+	    bindings.forEach(function(element){
+		if (element["variable"] === modified_variable){
+		    bindings[bindings.indexOf(element)]["value"] = new_value;
+		}
+	    });
+	    new_uqItem["forcedBindings"] = JSON.stringify(bindings);
+	    w2ui['uGrid'].set(leftrecid, new_uqItem);
+	    
+	    // update the query
+	    bindings = JSON.parse(uqItem["forcedBindings"]);
+	    bindings.forEach(function(element){
+	    	if (element["value"] !== ""){
+	    	    variable = "?" + element["variable"];
+	    	    query = query.replace(variable, element["value"]);
+	    	}
+	    });
+	    $('#updateQueryText').val(query);
+
+	    // debug
+	    log("INFO", "Forced binding updated in Query/Update");
+	    
+	}
     });
     w2ui['updateLayout'].content('right', w2ui['ufbGrid']);
 
