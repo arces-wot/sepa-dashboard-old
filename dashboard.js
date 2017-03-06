@@ -9,8 +9,10 @@ $(function(){
     function log(level, text){
     
 	t = new Date();
+	msg = "[" + t.toTimeString() + "][" + level + "] " + text;
 	$("#debugText").empty();
-	$("#debugText").text("[" + t.toTimeString() + "][" + level + "] " + text);
+	$("#debugText").text(msg);
+	console.log(msg);
 
     };   
 
