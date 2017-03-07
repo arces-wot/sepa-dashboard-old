@@ -523,7 +523,40 @@ $(function(){
 	fields: [
 	    { name: 'subscribeHost', type: 'text'},
 	    { name: 'subText', type: 'text'} 
-	]
+	],
+	actions: {
+	    subscribe: function(event){
+		
+		// retrieve subscription text
+		wsText = $("#subText").val();
+		
+		// retrieve host
+		wsHost = $("#subscribeHost").val();
+
+		// open connection 
+		var ws = new WebSocket(wsHost);
+
+		// send subscription
+		ws.onopen = function(){
+		    ws.send("subscribe=" + wsText);
+		};
+
+		// handler for received messages
+		ws.onmessage = function(event){
+		    console.log(event);
+		};
+
+		// handler for the ws closing
+		ws.onclose = function(event){
+		    console.log("WS CHIUSA");
+		};
+
+		console.log(event);
+	    },
+	    unsubscribe: function(event){
+		console.log(event);
+	    }
+	}
     });
     w2ui['subscribeLayout'].content('bottom', w2ui['sForm']);
     
