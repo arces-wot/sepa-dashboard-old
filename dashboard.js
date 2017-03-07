@@ -11,7 +11,7 @@ $(function(){
     function build_prefix_section(){
 	ps = "";
 	for (record in w2ui['nsGrid'].records){
-	    ps = ps + "PREFIX " + w2ui['nsGrid'].records[record]["prefix"] + ": <" + w2ui['nsGrid'].records[record]["namespace"] + "> .\n";
+	    ps = ps + "PREFIX " + w2ui['nsGrid'].records[record]["prefix"] + ": <" + w2ui['nsGrid'].records[record]["namespace"] + ">\n";
 	}
 	return ps;
     };
@@ -411,7 +411,30 @@ $(function(){
 
 	    },
 	    query: function(){
-		log("WARNING", "QUERY yet to implement!");
+
+		// get the HTTP host
+		httpHost = $('#updateQueryHost').val();
+		
+		// sparql update
+		updateQuery = build_prefix_section() + $('#updateQueryText').val();
+		console.log(updateQuery);
+
+		// do an HTTP POST request
+		var req = $.ajax({
+		    url: httpHost,
+		    crossOrigin: true,
+		    method: 'POST',
+		    contentType: "application/sparql-query",
+		    data: updateQuery,	
+		    statusCode: {
+			200: function(){
+			    log("INFO", "QUERY Request Successful (200 OK)");
+			}
+		    }
+		});
+
+
+
 	    }
 	}
     });
