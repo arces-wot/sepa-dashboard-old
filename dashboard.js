@@ -4,6 +4,20 @@ $(function(){
 
     ////////////////////////////////////////////////////////////////////////////////
     //
+    // BUILD PREFIX SECTION FUNCTION
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+
+    function build_prefix_section(){
+	ps = "";
+	for (record in w2ui['nsGrid'].records){
+	    ps = ps + "PREFIX " + w2ui['nsGrid'].records[record]["prefix"] + ": <" + w2ui['nsGrid'].records[record]["namespace"] + "> .\n";
+	}
+	return ps;
+    };
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
     // LOG FUNCTION
     //
     ////////////////////////////////////////////////////////////////////////////////
@@ -379,7 +393,7 @@ $(function(){
 		httpHost = $('#updateQueryHost').val();
 		
 		// sparql update
-		updateQuery = $('#updateQueryText').val();
+		updateQuery = build_prefix_section() + $('#updateQueryText').val();
 
 		// do an HTTP POST request
 		var req = $.ajax({
@@ -536,7 +550,7 @@ $(function(){
 		var subid = null;
 		
 		// retrieve subscription text
-		wsText = $("#subText").val();
+		wsText = build_prefix_section() + $("#subText").val();
 		
 		// retrieve host
 		wsHost = $("#subscribeHost").val();
@@ -588,6 +602,8 @@ $(function(){
 
 	    },
 	    unsubscribe: function(event){
+
+		build_prefix_section();
 
 		// get selected
 		subid = $("#activeSubs").data("selected")["id"];
