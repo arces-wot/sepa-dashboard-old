@@ -354,9 +354,9 @@ $(function(){
     updateForm = "<div id='updateForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
         "<div class='w2ui-field'><label>HTTP Host:</label><div>" +
-        "<input type='text' value='http://localhost:8000/sparql' id='updateQueryHost' style='width: 385px;'></div></div>" +
+        "<input type='text' value='http://localhost:8000/sparql' name='updateQueryHost' style='width: 385px;'></div></div>" +
         "<div class='w2ui-field'><label>Text:</label><div>" +
-        "<textarea id='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
+        "<textarea name='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
         "</div>" +
 	"<div class='w2ui-buttons'>" +
         "<button class='w2ui-btn' name='update'>Update</button>" +
@@ -507,7 +507,7 @@ $(function(){
     subscribeForm = "<div id='subscribeForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
         "<div class='w2ui-field'><label>WS Host:</label><div>" +
-        "<input type='text' value='ws://localhost:9000/sparql' id='subscribeHost' style='width: 385px;'></div></div>" +
+        "<input type='text' value='ws://localhost:9000/sparql' name='subscribeHost' style='width: 385px;'></div></div>" +
         "<div class='w2ui-field'>" +
         "<label>Text:</label>" +
 	"<div>" +
