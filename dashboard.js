@@ -427,8 +427,9 @@ $(function(){
 		    contentType: "application/sparql-query",
 		    data: updateQuery,	
 		    statusCode: {
-			200: function(){
+			200: function(data){
 			    log("INFO", "QUERY Request Successful (200 OK)");
+			    $('#resulttext').val(data);
 			}
 		    }
 		});
