@@ -1,5 +1,7 @@
 $(function(){
 
+    var subscriptions = {};
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     // LOG FUNCTION
@@ -325,7 +327,7 @@ $(function(){
     // uqs section
     $('#uqsSection').w2layout({
         name: 'uqsLayout',
-	style: 'radius: 10px; padding: 5px; height: 450px;',
+	style: 'radius: 10px; padding: 5px; height: 550px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },	    
@@ -511,8 +513,10 @@ $(function(){
         "<div class='w2ui-field'>" +
         "<label>Text:</label>" +
 	"<div>" +
-        "<textarea name='subText' type='text' style='width: 385px; height: 80px; resize: none'></textarea>" +
-        "</div></div></div>" +
+        "<textarea name='subText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
+	"<div class='w2ui-field'><label>Active Subs:</label>" +
+	"<div><input type='list'  name='activeSubs' style='width: 385px;'></div></div>" +
+        "</div>" +
 	"<div class='w2ui-buttons'>" +
         "<button class='w2ui-btn' name='subscribe'>Subscribe</button>" +
         "<button class='w2ui-btn' name='unsubscribe'>Unsubscribe</button>" +
@@ -522,10 +526,14 @@ $(function(){
 	formHTML: subscribeForm,
 	fields: [
 	    { name: 'subscribeHost', type: 'text'},
-	    { name: 'subText', type: 'text'} 
+	    { name: 'subText', type: 'text'},
+	    { name: 'activeSubs', type: 'list' }
 	],
 	actions: {
 	    subscribe: function(event){
+		
+		// init
+		var subid = null;
 		
 		// retrieve subscription text
 		wsText = $("#subText").val();
@@ -544,17 +552,54 @@ $(function(){
 		// handler for received messages
 		ws.onmessage = function(event){
 		    console.log(event);
+		    msg = JSON.parse(event.data);
+		    if ("subscribed" in msg){
+
+			// get the subscription id
+			subid = msg["subscribed"];
+
+			// store the subid
+			$("#activeSubs").w2field()["options"]["items"].push(subid);
+			log("INFO", "Subscription " + subid + " started.");
+
+			// store the socket
+			subscriptions[subid] = ws;
+			
+		    } else if ("ping" in msg){
+			console.log("ping");
+		    } else if ("results" in msg)  {
+
+			// added bindings
+			added = msg["addedresults"];
+			console.log("ADDED (" + subid + ":");
+			console.log(JSON.stringify(added));
+
+			// removed bindings
+			removed = msg["removedresults"];
+			console.log("REMOVED (" + subid + "):");
+			console.log(JSON.stringify(removed));
+		    }
 		};
 
 		// handler for the ws closing
 		ws.onclose = function(event){
-		    console.log("WS CHIUSA");
+		    log("INFO", "Subscription " + subid + " closed.");
 		};
 
-		console.log(event);
 	    },
 	    unsubscribe: function(event){
-		console.log(event);
+
+		// get selected
+		subid = $("#activeSubs").data("selected")["id"];
+		subscriptions[subid].send("unsubscribe=" + subid);
+		
+		// remove item from dropdown list
+		$("#activeSubs").w2field()["options"]["items"].pop(subid);
+		$("#activeSubs").w2field().set(null);
+
+		// debug
+		log("INFO", "Subscription " + subid + " closed");
+
 	    }
 	}
     });
