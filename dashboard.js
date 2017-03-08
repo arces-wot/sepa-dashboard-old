@@ -444,8 +444,8 @@ $(function(){
     $().w2grid({	
 	name: 'uGrid',	
 	columns: [
-	    { field: 'updateName', caption: 'SPARQL Update/Query', size: '30%' },
-	    { field: 'forcedBindings', caption: 'Forced variables', size: '70%' },
+	    { field: 'updateName', caption: 'SPARQL Update/Query', size: '100%' },
+	    { field: 'forcedBindings', caption: 'Forced variables', hidden: true },
 	    { field: 'updateText', hidden: true }
 	],
 	onClick: function(event){
@@ -653,8 +653,8 @@ $(function(){
     $().w2grid({	
 	name: 'sGrid',	
 	columns: [
-	    { field: 'subscribe', caption: 'SPARQL Subscription', size: '30%' },
-	    { field: 'forcedBindings', caption: 'Forced variables', size: '70%' },
+	    { field: 'subscribe', caption: 'SPARQL Subscription', size: "100%" },
+	    { field: 'forcedBindings', caption: 'Forced variables', hidden: true },
 	    { field: 'subscribeText', hidden: true },
 	],
 	onClick: function(event){
