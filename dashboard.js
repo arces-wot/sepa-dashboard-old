@@ -434,8 +434,6 @@ $(function(){
 	],
 	onChange: function(event){
 
-	    console.log("HERE");
-	    
 	    // get the new value
 	    new_value = event.value_new;
 
@@ -667,9 +665,49 @@ $(function(){
 	name: 'sfbGrid',	
 	columns: [
 	    { field: 'svariable', caption: 'Variable', size: '35%' },
-	    { field: 'svalue', caption: 'Value', size: '35%' },
+	    { field: 'svalue', caption: 'Value', size: '35%',  editable: {type:'text'}  },
 	    { field: 'sliteral', caption: 'Literal', size: '30%' }
-	]
+	],
+	onChange: function(event){
+
+	    // get the new value
+	    new_value = event.value_new;
+
+	    // get the modified variable
+	    modified_variable = w2ui['sfbGrid'].get(event["recid"])["svariable"];
+
+	    // retrieve the original query
+	    uqItem = w2ui['sGrid'].get(w2ui['sGrid'].getSelection())[0];
+	    leftrecid = uqItem["recid"];
+	    original_query = uqItem["subscribeText"];
+	    var query = original_query;
+
+	    // update its field
+	    new_uqItem = uqItem;	    
+	    bindings = JSON.parse(uqItem["forcedBindings"]);
+	    bindings.forEach(function(element){
+		if (element["variable"] === modified_variable){
+		    bindings[bindings.indexOf(element)]["value"] = new_value;
+		}
+	    });
+	    new_uqItem["forcedBindings"] = JSON.stringify(bindings);
+	    w2ui['sGrid'].set(leftrecid, new_uqItem);
+	    
+	    // update the query
+	    bindings = JSON.parse(uqItem["forcedBindings"]);
+	    bindings.forEach(function(element){
+	    	if (element["value"] !== ""){
+	    	    variable = "?" + element["variable"];
+	    	    query = query.split(variable).join(element["value"]);
+	    	}
+	    });
+	    $('#subText').val(query);
+
+	    // debug
+	    log("INFO", "Forced binding updated in Query/Subscription");
+	    
+	}
+
     });
     w2ui['subscribeLayout'].content('right', w2ui['sfbGrid']);    
 
