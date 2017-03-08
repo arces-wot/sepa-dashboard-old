@@ -23,7 +23,7 @@ $(function(){
     ////////////////////////////////////////////////////////////////////////////////
 
     function log(level, text){
-    
+	
 	t = new Date();
 	msg = "[" + t.toTimeString() + "][" + level + "] " + text;
 	$("#debugText").empty();
@@ -63,8 +63,8 @@ $(function(){
 		w2ui['ufbGrid'].clear();
 
 		// clear the update/query form
-		$('#updateQueryHost').val("");
-		$('#updateQueryText').val("");
+		$('#updateHost').val("");
+		$('#updateText').val("");
 
 		// clear the update/query grid
 		w2ui['sGrid'].clear();
@@ -105,7 +105,7 @@ $(function(){
 		    fr = new FileReader();		    
 		    var text;
 		    fr.onload = function () {
-	
+			
 			var decodedData = fr.result;
 			
 			// parse the XML
@@ -172,29 +172,6 @@ $(function(){
 
 			});			
 
-			// retrieve queries
-			$xml.find("query").each(function(){
-			    
-			    // retrieve the query
-			    var uname = $(this).attr("id");
-
-			    // get the update text
-			    var utext = $(this).find("sparql").text();
-
-			    // retrieve the forced bindings
-			    var fbindings = [];
-			    $(this).find("binding").each(function(){
-				fbindings.push({"variable":$(this).attr("variable"), "value":$(this).attr("value"), "type":$(this).attr("type")}) ;
-			    });
-
-			    // get the current number of items in the grid
-			    var g = w2ui['uGrid'].records.length;	
-
-			    // add the element to the grid
-			    w2ui['uGrid'].add({recid: g+1, update: uname, forcedBindings: JSON.stringify(fbindings), updateText: utext });
-
-			});
-
 			// retrieve sepa host		   
 			$xml.find("parameters").each(function(){
 
@@ -206,7 +183,8 @@ $(function(){
 			    
 			    // build http url
 			    httpUrl = "http://" + url + ":" + httpport + path;
-			    $('#updateQueryHost').val(httpUrl);
+			    $('#updateHost').val(httpUrl);
+			    $('#queryHost').val(httpUrl);
 
 			    // build ws url
 			    wsUrl = "ws://" + url + ":" + wsport + path;
@@ -245,7 +223,7 @@ $(function(){
             { type: 'right', size: '50%', content: '<div id="nsForm"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
         ]
     });
-   
+    
     // namespaces grid
     $().w2grid({	
 	name: 'nsGrid',	
@@ -368,31 +346,30 @@ $(function(){
     // updateForm
     updateForm = "<div id='updateForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field'><label>HTTP Host:</label><div>" +
-        "<input type='text' value='http://localhost:8000/sparql' name='updateQueryHost' style='width: 385px;'></div></div>" +
+        "<div class='w2ui-field'><label>Update Host:</label><div>" +
+        "<input type='text' value='http://localhost:8000/sparql' name='updateHost' style='width: 385px;'></div></div>" +
         "<div class='w2ui-field'><label>Text:</label><div>" +
-        "<textarea name='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
+        "<textarea name='updateText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
         "</div>" +
 	"<div class='w2ui-buttons'>" +
         "<button class='w2ui-btn' name='update'><i class='fa fa-pencil' aria-hidden='true'></i>&nbsp;Update</button>" +
-        "<button class='w2ui-btn' name='query'><i class='fa fa-question' aria-hidden='true'></i>&nbsp;Query</button>" +
 	"</div></div>"    
 
     $().w2form({
 	name: 'uForm',
 	formHTML: updateForm,
 	fields: [
-	    { name: 'updateQueryHost', type: 'text' },
-	    { name: 'updateQueryText', type: 'text'}	    
+	    { name: 'updateHost', type: 'text' },
+	    { name: 'updateText', type: 'text'}	    
 	],
 	actions: {
 	    update: function(){
 
 		// get the HTTP host
-		httpHost = $('#updateQueryHost').val();
+		httpHost = $('#updateHost').val();
 		
 		// sparql update
-		updateQuery = build_prefix_section() + $('#updateQueryText').val();
+		update = build_prefix_section() + $('#updateText').val();
 
 		// do an HTTP POST request
 		var req = $.ajax({
@@ -400,7 +377,7 @@ $(function(){
 		    crossOrigin: true,
 		    method: 'POST',
 		    contentType: "application/sparql-update",
-		    data: updateQuery,	
+		    data: update,	
 		    statusCode: {
 			200: function(){
 			    log("INFO", "UPDATE Request Successful (200 OK)");
@@ -409,33 +386,6 @@ $(function(){
 		});
 
 	    },
-	    query: function(){
-
-		// get the HTTP host
-		httpHost = $('#updateQueryHost').val();
-		
-		// sparql update
-		updateQuery = build_prefix_section() + $('#updateQueryText').val();
-		console.log(updateQuery);
-
-		// do an HTTP POST request
-		var req = $.ajax({
-		    url: httpHost,
-		    crossOrigin: true,
-		    method: 'POST',
-		    contentType: "application/sparql-query",
-		    data: updateQuery,	
-		    statusCode: {
-			200: function(data){
-			    log("INFO", "QUERY Request Successful (200 OK)");
-			    $('#resultsLeftTextarea').val(data);
-			}
-		    }
-		});
-
-
-
-	    }
 	}
     });
     w2ui['updateLayout'].content('bottom', w2ui['uForm']);
@@ -444,7 +394,7 @@ $(function(){
     $().w2grid({	
 	name: 'uGrid',	
 	columns: [
-	    { field: 'updateName', caption: 'SPARQL Update/Query', size: '100%' },
+	    { field: 'updateName', caption: 'SPARQL Update', size: '100%' },
 	    { field: 'forcedBindings', caption: 'Forced variables', hidden: true },
 	    { field: 'updateText', hidden: true }
 	],
@@ -465,7 +415,7 @@ $(function(){
 	    });
 
 	    // fill the text area
-	    $('#updateQueryText').val(uqItem["updateText"]);
+	    $('#updateText').val(uqItem["updateText"]);
 
 	    // debug
 	    log("INFO", "Selected update/query " + uqItem["updateName"]);
@@ -484,6 +434,8 @@ $(function(){
 	],
 	onChange: function(event){
 
+	    console.log("HERE");
+	    
 	    // get the new value
 	    new_value = event.value_new;
 
@@ -512,10 +464,10 @@ $(function(){
 	    bindings.forEach(function(element){
 	    	if (element["value"] !== ""){
 	    	    variable = "?" + element["variable"];
-	    	    query = query.replace(variable, element["value"]);
+	    	    query = query.split(variable).join(element["value"]);
 	    	}
 	    });
-	    $('#updateQueryText').val(query);
+	    $('#updateText').val(query);
 
 	    // debug
 	    log("INFO", "Forced binding updated in Query/Update");
@@ -545,7 +497,9 @@ $(function(){
     // subscribeForm
     subscribeForm = "<div id='subscribeForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field'><label>WS Host:</label><div>" +
+        "<div class='w2ui-field'><label>Query Host:</label><div>" +
+        "<input type='text' value='http://localhost:8000/sparql' name='queryHost' style='width: 385px;'></div></div>" +
+	"<div class='w2ui-field'><label>Subscribe Host:</label><div>" +
         "<input type='text' value='ws://localhost:9000/sparql' name='subscribeHost' style='width: 385px;'></div></div>" +
         "<div class='w2ui-field'>" +
         "<label>Text:</label>" +
@@ -555,6 +509,7 @@ $(function(){
 	"<div><input type='list'  name='activeSubs' style='width: 385px;'></div></div>" +
         "</div>" +
 	"<div class='w2ui-buttons'>" +
+	"<button class='w2ui-btn' name='query'><i class='fa fa-question' aria-hidden='true'></i>&nbsp;Query</button>" +
         "<button class='w2ui-btn' name='subscribe'><i class='fa fa-chain' aria-hidden='true'></i>&nbsp;Subscribe</button>" +
         "<button class='w2ui-btn' name='unsubscribe'><i class='fa fa-chain-broken' aria-hidden='true'></i>&nbsp;Unsubscribe</button>" +
 	"</div></div>"    
@@ -562,11 +517,36 @@ $(function(){
 	name: 'sForm',
 	formHTML: subscribeForm,
 	fields: [
+	    { name: 'queryHost', type: 'text' },
 	    { name: 'subscribeHost', type: 'text'},
 	    { name: 'subText', type: 'text'},
 	    { name: 'activeSubs', type: 'list' }
 	],
 	actions: {
+	    query: function(){
+
+		// get the HTTP host
+		httpHost = $('#queryHost').val();
+		
+		// sparql query
+		query = build_prefix_section() + $('#subText').val();
+		console.log(update);
+
+		// do an HTTP POST request
+		var req = $.ajax({
+		    url: httpHost,
+		    crossOrigin: true,
+		    method: 'POST',
+		    contentType: "application/sparql-query",
+		    data: query,	
+		    statusCode: {
+			200: function(data){
+			    log("INFO", "QUERY Request Successful (200 OK)");
+			    $('#resultsRightTextarea').val(data);
+			}
+		    }
+		});
+	    },
 	    subscribe: function(event){
 		
 		// init
@@ -653,7 +633,7 @@ $(function(){
     $().w2grid({	
 	name: 'sGrid',	
 	columns: [
-	    { field: 'subscribe', caption: 'SPARQL Subscription', size: "100%" },
+	    { field: 'subscribe', caption: 'SPARQL Query/Subscription', size: "100%" },
 	    { field: 'forcedBindings', caption: 'Forced variables', hidden: true },
 	    { field: 'subscribeText', hidden: true },
 	],
@@ -703,7 +683,7 @@ $(function(){
     // results layout
     $("#resultSection").w2layout({
         name: 'resultSectionLayout',
-	style: 'border-radius: 10px; padding: 5px; height: 350px;',
+	style: 'border-radius: 10px; padding: 5px; height: 500px;',
         panels: [
             { type: 'left', size: '50%', content: '<div id="resultSectionLeft"></div>', style: 'margin: 5px; margin-top: 0px; margin-left: 0px; height: 100%;' },
             { type: 'right', size: '50%', content: '<div id="resultSectionRight"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px; height: 100%;' },
@@ -713,7 +693,7 @@ $(function(){
     // html code for left results form
     resultsLeftHtmlForm = "<div id='resultsLeftForm' style='width: 100%;'>" +
 	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field' style='margin-left: 0px;'>" +
+        "<div class='w2ui-field' style='margin-left: 0px;'><label>Update results:</label><br>" +
 	"<div style='margin-left: 5px;'><textarea name='resultsLeftTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
@@ -737,12 +717,15 @@ $(function(){
 
     // html code for right results form
     resultsRightHtmlForm = "<div id='resultsRightForm' style='width: 100%;'>" +
-	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field' style='margin-left: 0px;'>" +
-	"<div style='margin-left: 5px;'><textarea name='resultsRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
+	"<div class='w2ui-page page-0'>" +
+	"<div class='w2ui-field' style='margin-left: 0px;'><label>Query results:</label><br>" +
+ 	"<div style='margin-left: 5px;'><textarea name='resultsQRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div><br>" +
+        "<div class='w2ui-field' style='margin-left: 0px;'><label>Subscriptions:</label><br>" +
+ 	"<div style='margin-left: 5px;'><textarea name='resultsSRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='clear'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
+        "<button class='w2ui-btn' name='clearQ'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear Query Results</button>" +
+	"<button class='w2ui-btn' name='clearS'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear Subscription Panel</button>" +
 	"</div></div>"
 
     // results left layout
@@ -751,11 +734,15 @@ $(function(){
 	formHTML: resultsRightHtmlForm,
 	style: "margin: 5px;",
         fields: [
-    	    { field: 'resultsRightTextarea', type: 'text' },
+	    { field: 'resultsQRightTextarea', type: 'text' },
+    	    { field: 'resultsSRightTextarea', type: 'text' },
         ],
         actions: {
-	    clear: function(event){
-		$('#resultsRightTextarea').val("");
+	    clearS: function(event){
+		$('#resultsSRightTextarea').val("");
+	    },
+	    clearQ: function(event){
+		$('#resultsQRightTextarea').val("");
 	    }
 	}
     });
