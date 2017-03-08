@@ -5,15 +5,23 @@
     <title>SEPA Dashboard</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script type="text/javascript" src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>   
+    <script src="https://use.fontawesome.com/4aa7d1edb4.js"></script>
+    <style>.section-label { font-size: 14px; }</style>
     <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css" />
   </head>
 
   <!-- BODY -->
   <body>
 
+    <div id="header" align="center">
+      <img src="logo.png" style="width: 20%; padding: 10px; margin: 10px;">
+    </div>
+
     <!-- topToolbar section -->
     <div id='topToolbarSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      Configuration:<br/>
+      <div class="section-label">
+      <i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Configuration:<br/>
+      </div>
 	<div id="sapForm" style="width: 100%;">
 	  <div class="w2ui-page page-0">
             <div class="w2ui-field">
@@ -25,8 +33,8 @@
 	  </div><!-- w2ui-page -->
 	  
 	  <div class="w2ui-buttons">
-            <button class="w2ui-btn" name="loadSapBtn">Load</button>
-            <button class="w2ui-btn" name="clearBtn">Clear</button>
+            <button class="w2ui-btn" name="loadSapBtn"><i class='fa fa-upload' aria-hidden='true'></i>&nbsp;Load</button>
+            <button class="w2ui-btn" name="clearBtn"><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>
 	  </div><!-- w2ui-buttons -->
 
 	</div><!-- sapForm -->
@@ -34,7 +42,7 @@
     
     <!-- namespace section -->
     <div id='namespacesSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      Namespaces:<br/>
+      <div class="section-label"><i class="fa fa-tags" aria-hidden="true"></i>&nbsp;Namespaces:</div><br/>
       <div id='namespacesSection' style="width: 100%; padding: 5px; height: 200px;"></div>
     </div>
     
@@ -43,13 +51,13 @@
 
     <!-- namespace section -->
     <div id='resultSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      Results:<br/>
+      <div class="section-label"><i class="fa fa-tasks" aria-hidden="true"></i>&nbsp;Results:<br/></div>
       <div id='resultSection' style="width: 100%; padding: 5px;"></div>
     </div>
 
     <!-- debug section -->
     <div id='debugSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      Debug:<br/>
+      <div class="section-label"><i class="fa fa-thermometer-three-quarters" aria-hidden="true"></i>&nbsp;Debug:<br/></div>
       <div id='debugText' style="padding: 5px; margin: 10px;"></div>
     </div>
 

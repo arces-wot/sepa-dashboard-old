@@ -278,8 +278,8 @@ $(function(){
 	"<div><input name='namespaceEntry' type='text' style='width: 385px; height: 80px; resize: none'></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='update'>Add</button>" +
-        "<button class='w2ui-btn' name='query'>Delete</button>" +
+        "<button class='w2ui-btn' name='add'>Add</button>" +
+        "<button class='w2ui-btn' name='query'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Delete</button>" +
 	"</div></div>"    
 
     // namespaces form    
@@ -374,8 +374,8 @@ $(function(){
         "<textarea name='updateQueryText' type='text' style='width: 385px; height: 80px; resize: none'></textarea></div></div>" +
         "</div>" +
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='update'>Update</button>" +
-        "<button class='w2ui-btn' name='query'>Query</button>" +
+        "<button class='w2ui-btn' name='update'><i class='fa fa-pencil' aria-hidden='true'></i>&nbsp;Update</button>" +
+        "<button class='w2ui-btn' name='query'><i class='fa fa-question' aria-hidden='true'></i>&nbsp;Query</button>" +
 	"</div></div>"    
 
     $().w2form({
@@ -555,8 +555,8 @@ $(function(){
 	"<div><input type='list'  name='activeSubs' style='width: 385px;'></div></div>" +
         "</div>" +
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='subscribe'>Subscribe</button>" +
-        "<button class='w2ui-btn' name='unsubscribe'>Unsubscribe</button>" +
+        "<button class='w2ui-btn' name='subscribe'><i class='fa fa-chain' aria-hidden='true'></i>&nbsp;Subscribe</button>" +
+        "<button class='w2ui-btn' name='unsubscribe'><i class='fa fa-chain-broken' aria-hidden='true'></i>&nbsp;Unsubscribe</button>" +
 	"</div></div>"    
     $().w2form({
 	name: 'sForm',
@@ -717,7 +717,7 @@ $(function(){
 	"<div style='margin-left: 5px;'><textarea name='resultsLeftTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='clear'>Clear</button>" +
+        "<button class='w2ui-btn' name='clear'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
 	"</div></div>"
 
     // results left layout
@@ -742,7 +742,7 @@ $(function(){
 	"<div style='margin-left: 5px;'><textarea name='resultsRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='clear'>Clear</button>" +
+        "<button class='w2ui-btn' name='clear'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
 	"</div></div>"
 
     // results left layout
