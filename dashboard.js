@@ -77,7 +77,7 @@ $(function(){
 		$('#subText').val("");
 
 		// clear the results area
-		$('#resulttext').val("");
+		$('#resultsLeftTextarea').val("");
 
 		// clear debug area
 		$("#debugText").empty();
@@ -105,8 +105,7 @@ $(function(){
 		    fr = new FileReader();		    
 		    var text;
 		    fr.onload = function () {
-
-			$('#resulttext').val(fr.result);
+	
 			var decodedData = fr.result;
 			
 			// parse the XML
@@ -429,7 +428,7 @@ $(function(){
 		    statusCode: {
 			200: function(data){
 			    log("INFO", "QUERY Request Successful (200 OK)");
-			    $('#resulttext').val(data);
+			    $('#resultsLeftTextarea').val(data);
 			}
 		    }
 		});
@@ -617,6 +616,11 @@ $(function(){
 			console.log("REMOVED (" + subid + "):");
 			console.log(JSON.stringify(removed));
 		    }
+
+		    // put the message in the proper text area
+		    current_text = $("#resultsRightTextarea").val();
+		    $("#resultsRightTextarea").val(current_text + "\n" + event.data);
+
 		};
 
 		// handler for the ws closing
@@ -688,5 +692,73 @@ $(function(){
 	]
     });
     w2ui['subscribeLayout'].content('right', w2ui['sfbGrid']);    
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // RESULTS AREA
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+
+    // results layout
+    $("#resultSection").w2layout({
+        name: 'resultSectionLayout',
+	style: 'border-radius: 10px; padding: 5px; height: 350px;',
+        panels: [
+            { type: 'left', size: '50%', content: '<div id="resultSectionLeft"></div>', style: 'margin: 5px; margin-top: 0px; margin-left: 0px; height: 100%;' },
+            { type: 'right', size: '50%', content: '<div id="resultSectionRight"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px; height: 100%;' },
+        ]
+    });
+
+    // html code for left results form
+    resultsLeftHtmlForm = "<div id='resultsLeftForm' style='width: 100%;'>" +
+	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field' style='margin-left: 0px;'>" +
+	"<div style='margin-left: 5px;'><textarea name='resultsLeftTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
+	"</div>" + 
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='clear'>Clear</button>" +
+	"</div></div>"
+
+    // results left layout
+    $("#resultSectionLeft").w2form({
+        name  : 'resultsLeftForm',
+	formHTML: resultsLeftHtmlForm,
+	style: "margin: 5px;",
+        fields: [
+    	    { field: 'resultsLeftTextarea', type: 'text' },
+        ],
+        actions: {
+	    clear: function(event){
+		$('#resultsLeftTextarea').val("");
+	    }
+	}
+    });
+
+    // html code for right results form
+    resultsRightHtmlForm = "<div id='resultsRightForm' style='width: 100%;'>" +
+	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field' style='margin-left: 0px;'>" +
+	"<div style='margin-left: 5px;'><textarea name='resultsRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
+	"</div>" + 
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='clear'>Clear</button>" +
+	"</div></div>"
+
+    // results left layout
+    $("#resultSectionRight").w2form({
+        name  : 'resultsRightForm',
+	formHTML: resultsRightHtmlForm,
+	style: "margin: 5px;",
+        fields: [
+    	    { field: 'resultsRightTextarea', type: 'text' },
+        ],
+        actions: {
+	    clear: function(event){
+		$('#resultsRightTextarea').val("");
+	    }
+	}
+    });
+    
     
 });
