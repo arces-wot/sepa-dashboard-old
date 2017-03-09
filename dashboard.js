@@ -528,7 +528,7 @@ $(function(){
 		
 		// sparql query
 		query = build_prefix_section() + $('#subText').val();
-		console.log(update);
+		console.log(query);
 
 		// do an HTTP POST request
 		var req = $.ajax({
@@ -540,7 +540,7 @@ $(function(){
 		    statusCode: {
 			200: function(data){
 			    log("INFO", "QUERY Request Successful (200 OK)");
-			    $('#resultsRightTextarea').val(data);
+			    $('#resultsQRightTextarea').val(data);
 			}
 		    }
 		});
@@ -766,7 +766,7 @@ $(function(){
 	"<button class='w2ui-btn' name='clearS'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear Subscription Panel</button>" +
 	"</div></div>"
 
-    // results left layout
+    // results right layout
     $("#resultSectionRight").w2form({
         name  : 'resultsRightForm',
 	formHTML: resultsRightHtmlForm,
@@ -784,6 +784,15 @@ $(function(){
 	    }
 	}
     });
-    
+
+    // Query grid
+    $('#queryGrid').w2grid({
+	name: 'qGrid',	
+	columns: [
+	    { field: 's', caption: '?s', size: '33%' },
+	    { field: 'p', caption: '?p', size: '33%' },
+	    { field: 'o', caption: '?o', size: '34%' }
+	]	
+    });
     
 });
