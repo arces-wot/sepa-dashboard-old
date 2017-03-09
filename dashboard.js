@@ -78,6 +78,10 @@ $(function(){
 
 		// clear the results area
 		$('#resultsLeftTextarea').val("");
+		$('#resultsSRightTextarea').val("");
+
+		// clear the query results grid
+		w2ui['qGrid'].clear();
 
 		// clear debug area
 		$("#debugText").empty();
@@ -523,6 +527,9 @@ $(function(){
 	actions: {
 	    query: function(){
 
+		// initialize data
+		var output = null;
+
 		// get the HTTP host
 		httpHost = $('#queryHost').val();
 		
@@ -539,11 +546,65 @@ $(function(){
 		    data: query,	
 		    statusCode: {
 			200: function(data){
+
+			    // retrieve the output
 			    log("INFO", "QUERY Request Successful (200 OK)");
-			    $('#resultsQRightTextarea').val(data);
+			    output = JSON.parse(data);
+
+			    // get the list of variables
+			    variables = [];
+			    for (v in output["head"]["vars"]){
+				variables.push(output["head"]["vars"][v]);				
+			    }			 
+
+			    // get the current number of columns
+			    oldColNum = w2ui['qGrid'].columns.length;
+
+			    // get the number of needed columns
+			    newColNum = output["head"]["vars"].length;
+
+			    // if needed > current: add column
+			    if (newColNum > oldColNum){
+				diff = newColNum - oldColNum;
+				for (i=0; i<diff; i++){
+				    w2ui['qGrid'].addColumn({ field: i.toString(), caption: 'temp', size: "0" });
+				};				
+			    } 
+			    // else columns must be removed
+			    else if (newColNum < oldColNum){
+				diff =  oldColNum - newColNum;
+				i = 0;
+				w2ui['qGrid'].columns.forEach(function(column){
+				    if (i < diff){
+					w2ui['qGrid'].removeColumn(column["field"]);
+					i++;
+				    };
+				});
+
+			    } 
+			    
+			    // now resize and rename every column!
+			    for (column in w2ui["qGrid"].columns){
+				w2ui["qGrid"].columns[column]["field"] = variables[column];				
+				w2ui["qGrid"].columns[column]["caption"] = "?" + variables[column];
+			    }
+			    w2ui["qGrid"].refresh();
+			    
+			    // fill every row
+			    counter = 0;
+			    for (row in output["results"]["bindings"]){
+				r = new Object();
+				r["recid"] = counter;
+				counter++;
+				for (v in variables){
+				    r[variables[v]] = output["results"]["bindings"][row][variables[v]]["value"];
+				}
+				w2ui["qGrid"].add(r);
+			    }
 			}
 		    }
 		});
+
 	    },
 	    subscribe: function(event){
 		
@@ -721,7 +782,7 @@ $(function(){
     // results layout
     $("#resultSection").w2layout({
         name: 'resultSectionLayout',
-	style: 'border-radius: 10px; padding: 5px; height: 500px;',
+	style: 'border-radius: 10px; padding: 5px; height: 400px;',
         panels: [
             { type: 'left', size: '50%', content: '<div id="resultSectionLeft"></div>', style: 'margin: 5px; margin-top: 0px; margin-left: 0px; height: 100%;' },
             { type: 'right', size: '50%', content: '<div id="resultSectionRight"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px; height: 100%;' },
@@ -732,7 +793,7 @@ $(function(){
     resultsLeftHtmlForm = "<div id='resultsLeftForm' style='width: 100%;'>" +
 	"<div class='w2ui-page page-0'>" + 
         "<div class='w2ui-field' style='margin-left: 0px;'><label>Update results:</label><br>" +
-	"<div style='margin-left: 5px;'><textarea name='resultsLeftTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
+	"<div style='margin-left: 5px;'><textarea name='resultsLeftTextarea' type='text' style='width: 100%; height: 250px;' rows=100 cols=10></textarea></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
         "<button class='w2ui-btn' name='clear'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
@@ -756,13 +817,10 @@ $(function(){
     // html code for right results form
     resultsRightHtmlForm = "<div id='resultsRightForm' style='width: 100%;'>" +
 	"<div class='w2ui-page page-0'>" +
-	"<div class='w2ui-field' style='margin-left: 0px;'><label>Query results:</label><br>" +
- 	"<div style='margin-left: 5px;'><textarea name='resultsQRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div><br>" +
         "<div class='w2ui-field' style='margin-left: 0px;'><label>Subscriptions:</label><br>" +
- 	"<div style='margin-left: 5px;'><textarea name='resultsSRightTextarea' type='text' style='width: 100%; height: 150px;' rows=100 cols=10></textarea></div></div>" +
+ 	"<div style='margin-left: 5px;'><textarea name='resultsSRightTextarea' type='text' style='width: 100%; height: 250px;' rows=100 cols=10></textarea></div></div>" +
 	"</div>" + 
 	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='clearQ'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear Query Results</button>" +
 	"<button class='w2ui-btn' name='clearS'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear Subscription Panel</button>" +
 	"</div></div>"
 
@@ -772,16 +830,12 @@ $(function(){
 	formHTML: resultsRightHtmlForm,
 	style: "margin: 5px;",
         fields: [
-	    { field: 'resultsQRightTextarea', type: 'text' },
     	    { field: 'resultsSRightTextarea', type: 'text' },
         ],
         actions: {
 	    clearS: function(event){
 		$('#resultsSRightTextarea').val("");
 	    },
-	    clearQ: function(event){
-		$('#resultsQRightTextarea').val("");
-	    }
 	}
     });
 
