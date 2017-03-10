@@ -346,7 +346,7 @@ $(function(){
     // uqs section
     $('#uqsSection').w2layout({
         name: 'uqsLayout',
-	style: 'radius: 10px; padding: 5px; height: 550px;',
+	style: 'radius: 10px; padding: 5px; height: 580px;',
         panels: [
             { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
             { type: 'right', size: '50%', content: 'right', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },	    
@@ -861,7 +861,7 @@ $(function(){
     // results layout
     $("#resultSection").w2layout({
         name: 'resultSectionLayout',
-	style: 'border-radius: 10px; padding: 5px; height: 400px;',
+	style: 'border-radius: 10px; padding: 10px; padding-top:height: 400px;',
         panels: [
             { type: 'left', size: '50%', content: '<div id="resultSectionLeft"></div>', style: 'margin: 5px; margin-top: 0px; margin-left: 0px; height: 100%;' },
             { type: 'right', size: '50%', content: '<div id="resultSectionRight"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px; height: 100%;' },

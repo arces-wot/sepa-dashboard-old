@@ -13,45 +13,69 @@
   <!-- BODY -->
   <body>
 
+    <!-- header -->
     <div id="header" align="center">
       <img src="logo.png" style="width: 20%; padding: 10px; margin: 10px;">
     </div>
+    <!-- end of header -->
+
 
     <!-- topToolbar section -->
     <div id='topToolbarSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      <div class="section-label">
-      <i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Configuration:<br/>
+      
+      <!-- topToolbar label section -->
+      <div class="section-label" style="margin: 10px;">
+	<i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Configuration:<br/>
       </div>
-	<div id="sapForm" style="width: 100%;">
-	  <div class="w2ui-page page-0">
-            <div class="w2ui-field">
-              <label>Load SAP File:</label>
-              <div>
-                <input id="sapFile" type="file"/>
-              </div>
-            </div><!-- w2ui-field -->
-	  </div><!-- w2ui-page -->
-	  
-	  <div class="w2ui-buttons">
-            <button class="w2ui-btn" name="loadSapBtn"><i class='fa fa-upload' aria-hidden='true'></i>&nbsp;Load</button>
-            <button class="w2ui-btn" name="clearBtn"><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>
-	  </div><!-- w2ui-buttons -->
 
-	</div><!-- sapForm -->
-    </div><!-- topToolbarSectionContainer -->
+      <!-- topToolbar form -->
+      <div id="sapForm" style="width: 100%;">
+	<div class="w2ui-page page-0">
+          <div class="w2ui-field">
+            <label>Load SAP File:</label>
+            <div>
+              <input id="sapFile" type="file"/>
+            </div>
+          </div>
+	</div>
+	
+	<div class="w2ui-buttons">
+          <button class="w2ui-btn" name="loadSapBtn"><i class='fa fa-upload' aria-hidden='true'></i>&nbsp;Load</button>
+          <button class="w2ui-btn" name="clearBtn"><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>
+	</div>
+      </div>
+      <!-- end of topToolbar form -->
+
+    </div>
+    <!-- end of topToolbar Section -->
     
+
     <!-- namespace section -->
     <div id='namespacesSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      <div class="section-label"><i class="fa fa-tags" aria-hidden="true"></i>&nbsp;Namespaces:</div><br/>
-      <div id='namespacesSection' style="width: 100%; padding: 5px; height: 200px;"></div>
+
+      <!-- namespace label section -->
+      <div class="section-label" style="margin: 10px;"><i class="fa fa-tags" aria-hidden="true"></i>&nbsp;Namespaces:</div><br/>
+      
+      <!-- namespace content section -->
+      <div id='namespacesSection' style="width: 100%; height: 200px;"></div>
+
     </div>
+    <!-- end of namespace section -->
+
     
     <!-- update/query/subscribe section -->
-    <div id="uqsSection" style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset"></div>    
+    <div id="uqsSection" style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
+    </div>    
+    <!-- end of update/query/subscribe section -->
+
 
     <!-- results section -->
     <div id='resultSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      <div class="section-label"><i class="fa fa-tasks" aria-hidden="true"></i>&nbsp;Results:<br/></div>
+
+      <!-- results label section -->
+      <div class="section-label" style="margin: 10px;"><i class="fa fa-tasks" aria-hidden="true"></i>&nbsp;Results:<br/></div>
+      
+      <!-- results content section -->
       <label>Added Bindings</label><br><br>
       <div id='addedBindingsGrid' style="width: 100%; padding: 5px; height: 200px;"></div>
       <br>
@@ -60,13 +84,23 @@
       <br>
       <label>Query Results</label><br><br>
       <div id='queryGrid' style="width: 100%; padding: 5px; height: 400px;"></div>
+
     </div>
+    <!-- end of results section -->
+
 
     <!-- debug section -->
     <div id='debugSectionContainer' style="padding: 5px; margin: 10px; border-width: 1px; border-style: solid; border-radius: 10px; border-color: #cccccc;" class="w2ui-reset">
-      <div class="section-label"><i class="fa fa-thermometer-three-quarters" aria-hidden="true"></i>&nbsp;Debug:<br/></div>
+
+      <!-- debug label section -->
+      <div class="section-label" style="margin: 10px;"><i class="fa fa-thermometer-three-quarters" aria-hidden="true"></i>&nbsp;Debug:<br/></div>
+
+      <!-- debug content section -->
       <div id='debugText' style="padding: 5px; margin: 10px;"></div>
+
     </div>
+    <!-- end of debug section -->
+
 
     <!-- footer -->
     <div id="footer" align="center">
@@ -74,6 +108,7 @@
 	<b>SEPA Dashboard</b> is released under GPL General Public License version 3.
       </div>
     </div>
+
 
     <!-- the script -->
     <script type="text/javascript" src="dashboard.js"></script>
