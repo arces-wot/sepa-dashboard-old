@@ -635,7 +635,6 @@ $(function(){
 
 		    	// get the subscription id
 		    	subid = msg["subscribed"];
-			console.log("SUBID: " + subid);
 
 			// store the subid
 			$("#activeSubs").w2field()["options"]["items"].push(subid);
@@ -644,9 +643,6 @@ $(function(){
 		    	// store the socket
 		    	subscriptions[subid] = ws;
 			
-		    } else if ("ping" in msg){
-		    	console.log("ping");
-
 		    } else if ("results" in msg)  {
 
 			// get the variables
@@ -702,14 +698,6 @@ $(function(){
 			    }
 			    w2ui['rbGrid'].add(r);
 			}
-
-			
-
-		    // 	// removed bindings
-		    // 	removed = msg["removedresults"];
-		    // 	console.log("REMOVED (" + subid + "):");
-		    // 	console.log(JSON.stringify(removed));
-
 		    }
 
 		    // // put the message in the proper text area
@@ -726,15 +714,19 @@ $(function(){
 	    },
 	    unsubscribe: function(event){
 
-		build_prefix_section();
-
 		// get selected
 		subid = $("#activeSubs").data("selected")["id"];
+		if (typeof(subid) == "undefined"){
+		    return false;
+		}
 		subscriptions[subid].send("unsubscribe=" + subid);
 		
 		// remove item from dropdown list
 		$("#activeSubs").w2field()["options"]["items"].pop(subid);
 		$("#activeSubs").w2field().set(null);
+
+		// remove the socket from the list
+		delete subscriptions[subid];
 
 		// debug
 		log("INFO", "Subscription " + subid + " closed");
