@@ -76,10 +76,11 @@ $(function(){
 		$('#subscribeHost').val("");
 		$('#subText').val("");
 
-		// clear the results area
-		$('#resultsLeftTextarea').val("");
-		$('#resultsSRightTextarea').val("");
-
+		// clear the sub results area
+		w2ui['abGrid'].clear();
+		w2ui['rbGrid'].clear();
+		
+		
 		// clear the query results grid
 		w2ui['qGrid'].clear();
 
@@ -699,11 +700,6 @@ $(function(){
 			    w2ui['rbGrid'].add(r);
 			}
 		    }
-
-		    // // put the message in the proper text area
-		    // current_text = $("#resultsRightTextarea").val();
-		    // $("#resultsRightTextarea").val(current_text + "\n" + event.data);
-
 		};
 
 		// handler for the ws closing
@@ -714,48 +710,32 @@ $(function(){
 	    },
 	    unsubscribe: function(event){
 
-		// get selected
+		// get selected subscription
 		subid = $("#activeSubs").data("selected")["id"];
+		if (typeof(subid) !== "undefined"){
 
-		items = [];
-		items_old = $("#activeSubs").w2field()["options"]["items"];
-		for (i in items_old){
-		    
-		    obid = items_old[i]["id"];
-		    if (obid !== subid){
-			item = new Object;
-			item["id"] = items_old[i]["id"];
-			item["text"] = items_old[i]["id"];
-			items.push(item);
+		    // remove the sub from the dropdown list
+		    items = [];
+		    items_old = $("#activeSubs").w2field()["options"]["items"];
+		    for (i in items_old){		    
+			obid = items_old[i]["id"];
+			if (obid !== subid){
+			    item = new Object;
+			    item["id"] = items_old[i]["id"];
+			    item["text"] = items_old[i]["id"];
+			    items.push(item);
+			}
 		    }
+		    $("#activeSubs").data('selected', {}).change(); 
+		    $("#activeSubs").w2field('list', {items: items} );
+		    $("#activeSubs").w2field().refresh();
+		    
+		    // remove the subscription from the list
+		    delete subscriptions[subid];
+		    
+		    // debug
+		    log("INFO", "Subscription " + subid + " closed");
 		}
-
-		$("#activeSubs").data('selected', {}).change(); 
-		$("#activeSubs").w2field('list', {items: items} );
-		$("#activeSubs").w2field().refresh();
-		
-		console.log($("#activeSubs").data);
-
-		// delete item;
-		// console.log(subid);
-		// if (typeof(subid) == "undefined"){
-		//     return false;
-		// }
-		// subscriptions[subid].send("unsubscribe=" + subid);
-		
-		// // remove item from dropdown list
-		// // $("#activeSubs").w2field()["options"]["items"].pop(subid);
-		// // i = $("#activeSubs").w2field()["options"]["items"].indexOf(subid);
-		// console.log($("#activeSubs").w2field()["options"]["items"]);
-		// $("#activeSubs").data('selected', {}).change(); 
-		// $("#activeSubs").w2field().refresh();
-
-		// // remove the socket from the list
-		// delete subscriptions[subid];
-
-		// // debug
-		// log("INFO", "Subscription " + subid + " closed");
-
 	    }
 	}
     });
