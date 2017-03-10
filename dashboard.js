@@ -637,7 +637,7 @@ $(function(){
 		    	subid = msg["subscribed"];
 
 			// store the subid
-			$("#activeSubs").w2field()["options"]["items"].push(subid);
+			$("#activeSubs").w2field()["options"]["items"].push({"id":subid, "text":subid});
 			log("INFO", "Subscription " + subid + " started.");
 
 		    	// store the socket
@@ -716,22 +716,45 @@ $(function(){
 
 		// get selected
 		subid = $("#activeSubs").data("selected")["id"];
-		console.log(subid);
-		if (typeof(subid) == "undefined"){
-		    return false;
+
+		items = [];
+		items_old = $("#activeSubs").w2field()["options"]["items"];
+		for (i in items_old){
+		    
+		    obid = items_old[i]["id"];
+		    if (obid !== subid){
+			item = new Object;
+			item["id"] = items_old[i]["id"];
+			item["text"] = items_old[i]["id"];
+			items.push(item);
+		    }
 		}
-		subscriptions[subid].send("unsubscribe=" + subid);
-		
-		// remove item from dropdown list
-		$("#activeSubs").w2field()["options"]["items"].pop(subid);
+
 		$("#activeSubs").data('selected', {}).change(); 
+		$("#activeSubs").w2field('list', {items: items} );
 		$("#activeSubs").w2field().refresh();
+		
+		console.log($("#activeSubs").data);
 
-		// remove the socket from the list
-		delete subscriptions[subid];
+		// delete item;
+		// console.log(subid);
+		// if (typeof(subid) == "undefined"){
+		//     return false;
+		// }
+		// subscriptions[subid].send("unsubscribe=" + subid);
+		
+		// // remove item from dropdown list
+		// // $("#activeSubs").w2field()["options"]["items"].pop(subid);
+		// // i = $("#activeSubs").w2field()["options"]["items"].indexOf(subid);
+		// console.log($("#activeSubs").w2field()["options"]["items"]);
+		// $("#activeSubs").data('selected', {}).change(); 
+		// $("#activeSubs").w2field().refresh();
 
-		// debug
-		log("INFO", "Subscription " + subid + " closed");
+		// // remove the socket from the list
+		// delete subscriptions[subid];
+
+		// // debug
+		// log("INFO", "Subscription " + subid + " closed");
 
 	    }
 	}
