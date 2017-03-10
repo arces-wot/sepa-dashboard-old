@@ -80,6 +80,28 @@ $(function(){
 		w2ui['abGrid'].clear();
 		w2ui['rbGrid'].clear();
 		
+		// if no subscriptions are active
+		// remove all the columns from the grids
+		
+		console.log("NUMBER OF COLUMNS: " + w2ui["abGrid"].columns.length);
+
+		if (Object.keys(subscriptions).length === 0){
+
+		    // get the number of columns
+		    columns = [];
+		    for (column in w2ui["abGrid"].columns){
+			columns.push(w2ui["abGrid"].columns[column]["field"]);
+			console.log("PUSHING " + w2ui["abGrid"].columns[column]["field"]);
+		    }
+
+		    // remove all the columns but subid
+		    for (column = 0; column < columns.length ; column++ ){
+			if (columns[column].localeCompare("subid") !== 0){
+			    w2ui["abGrid"].removeColumn(columns[column]);
+			    w2ui["rbGrid"].removeColumn(columns[column]);
+			}
+		    }		    
+		}
 		
 		// clear the query results grid
 		w2ui['qGrid'].clear();
@@ -731,7 +753,10 @@ $(function(){
 		    $("#activeSubs").w2field().refresh();
 		    
 		    // remove the subscription from the list
+		    console.log(subscriptions);
+		    console.log(subscriptions[subid]);
 		    delete subscriptions[subid];
+		    console.log(subscriptions);
 		    
 		    // debug
 		    log("INFO", "Subscription " + subid + " closed");
