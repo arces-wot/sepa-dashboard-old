@@ -73,6 +73,7 @@ $(function(){
 		w2ui['sfbGrid'].clear();
 
 		// clear the update/query form
+		$('#queryHost').val("");
 		$('#subscribeHost').val("");
 		$('#subText').val("");
 
