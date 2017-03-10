@@ -627,38 +627,94 @@ $(function(){
 
 		// handler for received messages
 		ws.onmessage = function(event){
-		    console.log(event);
+
+		    // parse the message
 		    msg = JSON.parse(event.data);
+
 		    if ("subscribed" in msg){
 
-			// get the subscription id
-			subid = msg["subscribed"];
+		    	// get the subscription id
+		    	subid = msg["subscribed"];
+			console.log("SUBID: " + subid);
 
 			// store the subid
 			$("#activeSubs").w2field()["options"]["items"].push(subid);
 			log("INFO", "Subscription " + subid + " started.");
 
-			// store the socket
-			subscriptions[subid] = ws;
+		    	// store the socket
+		    	subscriptions[subid] = ws;
 			
 		    } else if ("ping" in msg){
-			console.log("ping");
+		    	console.log("ping");
+
 		    } else if ("results" in msg)  {
 
-			// added bindings
-			added = msg["addedresults"];
-			console.log("ADDED (" + subid + ":");
-			console.log(JSON.stringify(added));
+			// get the variables
+			variables = msg["results"]["head"]["vars"];
+			console.log(variables);
 
-			// removed bindings
-			removed = msg["removedresults"];
-			console.log("REMOVED (" + subid + "):");
-			console.log(JSON.stringify(removed));
+			// look if columns must be added
+			columns = []
+			for (column in w2ui["abGrid"].columns){
+			    columns.push(w2ui["abGrid"].columns[column]["field"]);
+			}
+			for (v in variables){
+			    if (columns.indexOf(variables[v]) === -1){
+				w2ui["abGrid"].addColumn({ field: variables[v], caption: '?' + variables[v], size: "100%" });
+				w2ui["rbGrid"].addColumn({ field: variables[v], caption: '?' + variables[v], size: "100%" });
+				w2ui["abGrid"].refresh();
+				w2ui["rbGrid"].refresh();
+			    }
+			}
+
+		    	// added bindings
+		    	added = msg["results"]["addedresults"];
+		    	console.log(JSON.stringify(added));
+		    	console.log("ADDED (" + msg["notification"] + ":");	
+
+			// fill the grid
+			for (e in added["bindings"]){
+
+			    g = w2ui['abGrid'].records.length;	
+			    r = new Object;
+			    r["recid"] = g+1;
+			    r["subid"] = msg["notification"];			    
+			    for (k in added["bindings"][e]){
+				r[k] = added["bindings"][e][k]["value"];
+			    }
+			    w2ui['abGrid'].add(r);
+			}
+			
+		    	// removed bindings
+		    	removed = msg["results"]["removedresults"];
+		    	console.log(JSON.stringify(removed));	
+		    	console.log("REMOVED (" + msg["notification"] + ":");
+
+			// fill the grid
+			for (e in removed["bindings"]){
+
+			    g = w2ui['rbGrid'].records.length;	
+			    r = new Object;
+			    r["recid"] = g+1;
+			    r["subid"] = msg["notification"];			    
+			    for (k in removed["bindings"][e]){
+				r[k] = removed["bindings"][e][k]["value"];
+			    }
+			    w2ui['rbGrid'].add(r);
+			}
+
+			
+
+		    // 	// removed bindings
+		    // 	removed = msg["removedresults"];
+		    // 	console.log("REMOVED (" + subid + "):");
+		    // 	console.log(JSON.stringify(removed));
+
 		    }
 
-		    // put the message in the proper text area
-		    current_text = $("#resultsRightTextarea").val();
-		    $("#resultsRightTextarea").val(current_text + "\n" + event.data);
+		    // // put the message in the proper text area
+		    // current_text = $("#resultsRightTextarea").val();
+		    // $("#resultsRightTextarea").val(current_text + "\n" + event.data);
 
 		};
 
@@ -838,6 +894,23 @@ $(function(){
 	    },
 	}
     });
+
+    // Added Bindings grid
+    $('#addedBindingsGrid').w2grid({
+	name: 'abGrid',	
+	columns: [
+	    { field: 'subid', caption: 'Sub ID', size: '33%' }
+	]	
+    });
+
+    // Query grid
+    $('#removedBindingsGrid').w2grid({
+	name: 'rbGrid',	
+	columns: [
+	    { field: 'subid', caption: 'Sub ID', size: '33%' },	   
+	]	
+    });
+
 
     // Query grid
     $('#queryGrid').w2grid({
