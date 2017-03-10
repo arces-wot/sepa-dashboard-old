@@ -716,6 +716,7 @@ $(function(){
 
 		// get selected
 		subid = $("#activeSubs").data("selected")["id"];
+		console.log(subid);
 		if (typeof(subid) == "undefined"){
 		    return false;
 		}
@@ -723,7 +724,8 @@ $(function(){
 		
 		// remove item from dropdown list
 		$("#activeSubs").w2field()["options"]["items"].pop(subid);
-		$("#activeSubs").w2field().set(null);
+		$("#activeSubs").data('selected', {}).change(); 
+		$("#activeSubs").w2field().refresh();
 
 		// remove the socket from the list
 		delete subscriptions[subid];
