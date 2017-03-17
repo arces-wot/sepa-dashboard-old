@@ -102,16 +102,12 @@ $(function(){
 		
 		// if no subscriptions are active
 		// remove all the columns from the grids
-		
-		console.log("NUMBER OF COLUMNS: " + w2ui["abGrid"].columns.length);
-
 		if (Object.keys(subscriptions).length === 0){
 
 		    // get the number of columns
 		    columns = [];
 		    for (column in w2ui["abGrid"].columns){
 			columns.push(w2ui["abGrid"].columns[column]["field"]);
-			console.log("PUSHING " + w2ui["abGrid"].columns[column]["field"]);
 		    }
 
 		    // remove all the columns but subid
@@ -371,7 +367,7 @@ $(function(){
     
     ////////////////////////////////////////////////////////////////////////////////
     //
-    // UPDATE/QUERY LAYOUT
+    // UPDATE LAYOUT
     //
     ////////////////////////////////////////////////////////////////////////////////
     
@@ -387,7 +383,7 @@ $(function(){
     });   
     w2ui['uqsLayout'].content('left', w2ui['updateLayout']);
 
-    // updateForm
+    // update form -- HTML
     updateForm = "<div id='updateForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
         "<div class='w2ui-field'><label>Update Host:</label><div>" +
@@ -399,6 +395,7 @@ $(function(){
         "<button class='w2ui-btn' name='update'><i class='fa fa-pencil' aria-hidden='true'></i>&nbsp;Update</button>" +
 	"</div></div>"    
 
+    // update form -- W2UI
     $().w2form({
 	name: 'uForm',
 	formHTML: updateForm,
@@ -524,7 +521,6 @@ $(function(){
     //
     ////////////////////////////////////////////////////////////////////////////////
     
-    // subscribe layout
     $().w2layout({
         name: 'subscribeLayout',
 	style: 'border-radius: 10px; padding: 5px;',
@@ -536,7 +532,7 @@ $(function(){
     });   
     w2ui['uqsLayout'].content('right', w2ui['subscribeLayout']);
 
-    // subscribeForm
+    // subscribeForm -- HTML
     subscribeForm = "<div id='subscribeForm' style='width: 750px;'>" +
 	"<div class='w2ui-page page-0'>" + 
         "<div class='w2ui-field'><label>Query Host:</label><div>" +
@@ -555,6 +551,8 @@ $(function(){
         "<button class='w2ui-btn' name='subscribe'><i class='fa fa-chain' aria-hidden='true'></i>&nbsp;Subscribe</button>" +
         "<button class='w2ui-btn' name='unsubscribe'><i class='fa fa-chain-broken' aria-hidden='true'></i>&nbsp;Unsubscribe</button>" +
 	"</div></div>"    
+
+    // subscribe form -- W2UI
     $().w2form({
 	name: 'sForm',
 	formHTML: subscribeForm,
@@ -687,7 +685,6 @@ $(function(){
 
 			// get the variables
 			variables = msg["results"]["head"]["vars"];
-			console.log(variables);
 
 			// look if columns must be added
 			columns = []
@@ -705,7 +702,6 @@ $(function(){
 
 		    	// added bindings
 		    	added = msg["results"]["addedresults"];
-		    	console.log(JSON.stringify(added));
 		    	console.log("ADDED (" + msg["notification"] + ":");	
 
 			// fill the grid
@@ -722,8 +718,7 @@ $(function(){
 			}
 			
 		    	// removed bindings
-		    	removed = msg["results"]["removedresults"];
-		    	console.log(JSON.stringify(removed));	
+		    	removed = msg["results"]["removedresults"];			
 		    	console.log("REMOVED (" + msg["notification"] + ":");
 
 			// fill the grid
@@ -884,56 +879,6 @@ $(function(){
         ]
     });
 
-    // html code for left results form
-    resultsLeftHtmlForm = "<div id='resultsLeftForm' style='width: 100%;'>" +
-	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field' style='margin-left: 0px;'><label>Update results:</label><br>" +
-	"<div style='margin-left: 5px;'><textarea name='resultsLeftTextarea' type='text' style='width: 100%; height: 250px;' rows=100 cols=10></textarea></div></div>" +
-	"</div>" + 
-	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='clear'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
-	"</div></div>"
-
-    // results left layout
-    $("#resultSectionLeft").w2form({
-        name  : 'resultsLeftForm',
-	formHTML: resultsLeftHtmlForm,
-	style: "margin: 5px;",
-        fields: [
-    	    { field: 'resultsLeftTextarea', type: 'text' },
-        ],
-        actions: {
-	    clear: function(event){
-		$('#resultsLeftTextarea').val("");
-	    }
-	}
-    });
-
-    // html code for right results form
-    resultsRightHtmlForm = "<div id='resultsRightForm' style='width: 100%;'>" +
-	"<div class='w2ui-page page-0'>" +
-        "<div class='w2ui-field' style='margin-left: 0px;'><label>Subscriptions:</label><br>" +
- 	"<div style='margin-left: 5px;'><textarea name='resultsSRightTextarea' type='text' style='width: 100%; height: 250px;' rows=100 cols=10></textarea></div></div>" +
-	"</div>" + 
-	"<div class='w2ui-buttons'>" +
-	"<button class='w2ui-btn' name='clearS'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear Subscription Panel</button>" +
-	"</div></div>"
-
-    // results right layout
-    $("#resultSectionRight").w2form({
-        name  : 'resultsRightForm',
-	formHTML: resultsRightHtmlForm,
-	style: "margin: 5px;",
-        fields: [
-    	    { field: 'resultsSRightTextarea', type: 'text' },
-        ],
-        actions: {
-	    clearS: function(event){
-		$('#resultsSRightTextarea').val("");
-	    },
-	}
-    });
-
     // Added Bindings grid
     $('#addedBindingsGrid').w2grid({
 	name: 'abGrid',	
@@ -955,7 +900,7 @@ $(function(){
 	}
     });
 
-    // Query grid
+    // Removed Bindings grid
     $('#removedBindingsGrid').w2grid({
 	name: 'rbGrid',	
 	columns: [
@@ -975,7 +920,6 @@ $(function(){
 	    }
 	}	
     });
-
 
     // Query grid
     $('#queryGrid').w2grid({
