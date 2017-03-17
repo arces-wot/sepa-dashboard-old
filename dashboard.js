@@ -45,12 +45,11 @@ $(function(){
         name: 'topLayout',
         panels: [
             { type: 'left', size: '50%', content: '<div id="sapForm" style="height: 100%;"></div>', style: 'margin: 5px;' },
-            { type: 'right', size: '50%', content: '<div id="nsForm"></div>', style: 'margin: 5px;' },
-            { type: 'bottom', size: '40%', content: 'bottom', style: 'margin: 5px;' },
+            { type: 'right', size: '50%', content: 'right', style: 'margin: 5px;' },
         ]
     });
 
-    // SAP form
+    // SAP form -- HTML
     var sapFormHtmlCode = "<div class='w2ui-page page-0'>" +
         "<div class='w2ui-field'><label>Load SAP File:</label>" +
         "<div><input id='sapFile' type='file'/></div>" +
@@ -61,7 +60,7 @@ $(function(){
         "<button class='w2ui-btn' name='clearBtn'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
 	"</div>";
 
-    // w2ui definition of the SAP form
+    // SAP form -- W2UI
     $('#sapForm').w2form({
         name  : 'sapFormJs',
 	formHTML: sapFormHtmlCode,
@@ -258,19 +257,87 @@ $(function(){
         }
     });
 
-    ////////////////////////////////////////////////////////////////////////////////
-    //
-    // NAMESPACE LAYOUT
-    //
-    ////////////////////////////////////////////////////////////////////////////////
+    // NS popup - HTML
+    nsFormPopupHtml = "<div id='nsFormPopup'>" +
+	"<div class='w2ui-page page-0'>" + 
+        "<div class='w2ui-field'><label>Prefix:</label>" +
+	"<div><input name='prefixEntry' type='text'></div></div>" +
+        "<div class='w2ui-field'><label>Namespace:</label>" +
+	"<div><input name='namespaceEntry' type='text'></div></div>" +
+	"</div>" + 
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='add'>Add</button>" +
+        "<button class='w2ui-btn' name='query'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Delete</button>" +
+	"</div></div>";
+
+    // NS popup - W2UI
+    var popupNsConfig = {
+	layout: {
+            name: 'popupNsLayout',
+            padding: 0,
+            panels: [
+		{ type: 'main', content: '<div id="nsFormPopup"></div>', style: 'margin: 5px;' }
+            ]
+	},
+	form: {
+            name  : 'popupNsForm',
+	    formHtml : nsFormPopupHtml,
+            fields: [
+    		{ field: 'prefixEntry', type: 'text', name: 'Prefix'},
+    		{ field: 'namespaceEntry',  type: 'text', name: 'Namespace' },
+            ],
+            actions: {
+		'Add': function (event) {
+		    
+		    // retrieve prefix and namespace
+		    var p = $('#Prefix').val();		
+		    var n = $('#Namespace').val();
+
+		    // get the current number of items in the grid
+		    var g = w2ui['nsGrid'].records.length;	
+
+		    // add the element to the grid
+		    w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
+
+		    // debug
+		    log("INFO", "Added prefix " + p + " (" + n + ")");		    
+		},	    
+	    }
+	}
+    };
+    $().w2layout(popupNsConfig.layout);
+    $("#nsFormPopup").w2form(popupNsConfig.form);
 
     // namespaces grid
     $().w2grid({	
 	name: 'nsGrid',	
+	show: {
+	    toolbar: true,
+	    toolbarDelete: true,
+	    toolbarAdd: true,
+	},
 	columns: [
 	    { field: 'prefix', caption: 'Prefix', size: '20%' },
 	    { field: 'namespace', caption: 'Namespace', size: '80%' }
 	],
+	onAdd: function(event){
+	    w2popup.open({
+		title   : 'nsPopup',
+		showMax : true,
+		body    : '<div id="main" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"></div>',
+		onOpen  : function (event) {
+		    event.onComplete = function () {
+			$('#w2ui-popup #main').w2render('popupNsLayout');
+			w2ui.popupNsLayout.content('main', w2ui.popupNsForm);
+		    }
+		},
+		onToggle: function (event) { 
+		    event.onComplete = function () {
+			w2ui.layout.resize();
+		    }
+		}        
+	    });
+	},
 	onClick: function(event){
 
 	    // retrieve the namespace
@@ -285,68 +352,7 @@ $(function(){
 
 	}
     });
-    w2ui['topLayout'].content('bottom', w2ui['nsGrid']);
-
-    // namespace html form
-    nsFormHtml = "<div id='nsForm' style='width: 100%;'>" +
-	"<div class='w2ui-page page-0'>" + 
-        "<div class='w2ui-field'><label>Prefix:</label>" +
-	"<div><input name='prefixEntry' type='text' style='width: 385px; height: 80px; resize: none'></div></div>" +
-        "<div class='w2ui-field'><label>Namespace:</label>" +
-	"<div><input name='namespaceEntry' type='text' style='width: 385px; height: 80px; resize: none'></div></div>" +
-	"</div>" + 
-	"<div class='w2ui-buttons'>" +
-        "<button class='w2ui-btn' name='add'>Add</button>" +
-        "<button class='w2ui-btn' name='query'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Delete</button>" +
-	"</div></div>"    
-
-    // namespaces form    
-    $('#nsForm').w2form({ 
-        name  : 'nsFormJs',
-	style: 'height: 100%',	
-	formHtml : nsFormHtml,
-        fields: [
-    	    { field: 'prefixEntry', type: 'text', name: 'Prefix'},
-    	    { field: 'namespaceEntry',  type: 'text', name: 'Namespace' },
-        ],
-        actions: {
-            'Add': function (event) {
-
-		// retrieve prefix and namespace
-		var p = $('#Prefix').val();		
-		var n = $('#Namespace').val();
-
-		// get the current number of items in the grid
-		var g = w2ui['nsGrid'].records.length;	
-
-		// add the element to the grid
-		w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
-
-		// debug
-		log("INFO", "Added prefix " + p + " (" + n + ")");
-		
-	    },	    
-	    'Delete': function (event) {
-
-		// get the selected indices
-		var s = w2ui['nsGrid'].getSelection();
-
-		// remove
-		w2ui['nsGrid'].remove(s);
-
-		// retrieve prefix and namespace
-		var p = $('#Prefix').val();		
-		var n = $('#Namespace').val();
-
-		// clear fields		
-		$('#Prefix').val("");		
-		$('#Namespace').val("");
-
-		// debug
-		log("INFO", "Deleted prefix " + p + " (" + n + ")");
-	    }
-        }
-    });
+    w2ui['topLayout'].content('right', w2ui['nsGrid']);
 
     
     ////////////////////////////////////////////////////////////////////////////////
