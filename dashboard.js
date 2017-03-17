@@ -38,8 +38,6 @@ $(function(){
     //
     ////////////////////////////////////////////////////////////////////////////////
 
-    var toolbarStyle = 'radius: 10px;';
-
     // TopLayout section
     $('#topLayout').w2layout({
         name: 'topLayout',
@@ -941,7 +939,20 @@ $(function(){
 	name: 'abGrid',	
 	columns: [
 	    { field: 'subid', caption: 'Sub ID', size: '33%' }
-	]	
+	],	
+	show: {
+	    toolbar: true
+	},
+	toolbar: {
+	    items: [	   
+		{id: "abGridClear", type:'button', caption: 'Clear'}
+	    ],
+	    onClick: function(event){
+		if (event.target.localeCompare("abGridClear") === 0){
+		    w2ui['abGrid'].clear();
+		}
+	    }
+	}
     });
 
     // Query grid
@@ -949,7 +960,20 @@ $(function(){
 	name: 'rbGrid',	
 	columns: [
 	    { field: 'subid', caption: 'Sub ID', size: '33%' },	   
-	]	
+	],	
+	show: {
+	    toolbar: true
+	},
+	toolbar: {
+	    items: [	   
+		{id: "rbGridClear", type:'button', caption: 'Clear'}
+	    ],
+	    onClick: function(event){
+		if (event.target.localeCompare("rbGridClear") === 0){
+		    w2ui['rbGrid'].clear();
+		}
+	    }
+	}	
     });
 
 
@@ -960,7 +984,20 @@ $(function(){
 	    { field: 's', caption: '?s', size: '33%' },
 	    { field: 'p', caption: '?p', size: '33%' },
 	    { field: 'o', caption: '?o', size: '34%' }
-	]	
+	],	
+	show: {
+	    toolbar: true
+	},
+	toolbar: {
+	    items: [	   
+		{id: "qGridClear", type:'button', caption: 'Clear'}
+	    ],
+	    onClick: function(event){
+		if (event.target.localeCompare("qGridClear") === 0){
+		    w2ui['qGrid'].clear();
+		}
+	    }
+	}	
     });
     
 });
