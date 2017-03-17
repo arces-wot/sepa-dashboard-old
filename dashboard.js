@@ -582,15 +582,26 @@ $(function(){
 		    method: 'POST',
 		    contentType: "application/sparql-query",
 		    data: query,	
-		    statusCode: {
-			200: function(data){
+		    error: function(event){
+			w2alert("Connection failed!");
+			return false;
+		    },
+		    success: function(data){
 
 			    // retrieve the output
 			    log("INFO", "QUERY Request Successful (200 OK)");
 			    output = JSON.parse(data);
 
+			    // check if error occurred
+			    if ("error" in output){
+				w2alert(output["error"]["message"]);
+				return false;
+			    }
+			    else w2alert("Query request successful");			    
+
 			    // get the list of variables
 			    variables = [];
+			    console.log(output);
 			    for (v in output["head"]["vars"]){
 				variables.push(output["head"]["vars"][v]);				
 			    }			 
@@ -638,8 +649,8 @@ $(function(){
 				    r[variables[v]] = output["results"]["bindings"][row][variables[v]]["value"];
 				}
 				w2ui["qGrid"].add(r);
+				
 			    }
-			}
 		    }
 		});
 
