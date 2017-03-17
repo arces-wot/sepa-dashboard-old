@@ -34,15 +34,37 @@ $(function(){
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    // CONFIGURATION LAYOUT
+    // TOP LAYOUT
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     var toolbarStyle = 'radius: 10px;';
 
+    // TopLayout section
+    $('#topLayout').w2layout({
+        name: 'topLayout',
+        panels: [
+            { type: 'left', size: '50%', content: '<div id="sapForm" style="height: 100%;"></div>', style: 'margin: 5px;' },
+            { type: 'right', size: '50%', content: '<div id="nsForm"></div>', style: 'margin: 5px;' },
+            { type: 'bottom', size: '40%', content: 'bottom', style: 'margin: 5px;' },
+        ]
+    });
+
+    // SAP form
+    var sapFormHtmlCode = "<div class='w2ui-page page-0'>" +
+        "<div class='w2ui-field'><label>Load SAP File:</label>" +
+        "<div><input id='sapFile' type='file'/></div>" +
+        "</div>" +
+	"</div>" +
+	"<div class='w2ui-buttons'>" +
+        "<button class='w2ui-btn' name='loadSapBtn'><i class='fa fa-upload' aria-hidden='true'></i>&nbsp;Load</button>" +
+        "<button class='w2ui-btn' name='clearBtn'><i class='fa fa-trash' aria-hidden='true'></i>&nbsp;Clear</button>" +
+	"</div>";
+
+    // w2ui definition of the SAP form
     $('#sapForm').w2form({
         name  : 'sapFormJs',
-	style: "margin: 5px;",
+	formHTML: sapFormHtmlCode,
         fields: [
     	    { field: 'sapFile', type: 'file' },
         ],
@@ -242,16 +264,6 @@ $(function(){
     //
     ////////////////////////////////////////////////////////////////////////////////
 
-    // namespaces section
-    $('#namespacesSection').w2layout({
-        name: 'nsLayout',
-	style: toolbarStyle,
-        panels: [
-            { type: 'left', size: '50%', content: 'left', style: 'margin: 5px; margin-top: 0px; margin-left: 0px;' },
-            { type: 'right', size: '50%', content: '<div id="nsForm"></div>', style: 'margin: 5px; margin-top: 0px; margin-right: 0px;' },
-        ]
-    });
-    
     // namespaces grid
     $().w2grid({	
 	name: 'nsGrid',	
@@ -273,7 +285,7 @@ $(function(){
 
 	}
     });
-    w2ui['nsLayout'].content('left', w2ui['nsGrid']);
+    w2ui['topLayout'].content('bottom', w2ui['nsGrid']);
 
     // namespace html form
     nsFormHtml = "<div id='nsForm' style='width: 100%;'>" +
