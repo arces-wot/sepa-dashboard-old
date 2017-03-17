@@ -503,7 +503,10 @@ $(function(){
 	    bindings.forEach(function(element){
 	    	if (element["value"] !== ""){
 	    	    variable = "?" + element["variable"];
-	    	    query = query.split(variable).join(element["value"]);
+		    if (element["type"].localeCompare("literal") == 0)
+			val = '"' + element["value"] + '"';
+		    else val = element["value"];
+	    	    query = query.split(variable).join(val);
 	    	}
 	    });
 	    $('#updateText').val(query);
@@ -860,7 +863,10 @@ $(function(){
 	    bindings.forEach(function(element){
 	    	if (element["value"] !== ""){
 	    	    variable = "?" + element["variable"];
-	    	    query = query.split(variable).join(element["value"]);
+		    if (element["type"].localeCompare("literal") == 0)
+			val = '"' + element["value"] + '"';
+		    else val = element["value"];
+	    	    query = query.split(variable).join(val);
 	    	}
 	    });
 	    $('#subText').val(query);
