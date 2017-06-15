@@ -148,93 +148,153 @@ $(function(){
 		    fr = new FileReader();		    
 		    var text;
 		    fr.onload = function () {
-			
-			var decodedData = fr.result;
-			
-			// parse the XML
-			xmlDoc = $.parseXML(decodedData);
-			$xml = $(xmlDoc);
-			
-			// namespaces
-			$xml.find("namespace").each(function(){
 
-			    // retrieve prefix and namespace
-			    p = $(this).attr('prefix');
-			    n = $(this).attr('suffix');
+			// read the content of the file
+			var decodedData = fr.result;
+		
+			// parse the JSON file
+			myJson = JSON.parse(decodedData);
+			
+			// retrieve namespaces
+			for (ns in myJson["namespaces"]){
 
 			    // get the current number of items in the grid
 			    var g = w2ui['nsGrid'].records.length;	
-
+			    
 			    // add the element to the grid
-			    w2ui['nsGrid'].add({recid: g+1, prefix: p, namespace: n});
-			});
+			    w2ui['nsGrid'].add({recid: g+1, prefix: ns, namespace: myJson["namespaces"][ns]});
+			}			 
 			
 			// retrieve subscriptions
-			$xml.find("subscribe").each(function(){
-			    
-			    // retrieve the update
-			    var sname = $(this).attr("id");
+			for (sname in myJson["subscribes"]){
 
-			    // get the subscription text
-			    var stext = $(this).find("sparql").text();
-
-			    // retrieve the forced bindings
+			    // forced bindings
+			    fbsection = myJson["subscribes"][sname]["forcedBindings"];
 			    var fbindings = [];
-			    $(this).find("binding").each(function(){
-				fbindings.push({"variable":$(this).attr("variable"), "value":$(this).attr("value"), "type":$(this).attr("type")}) ;
-			    });
+			    for (variable in fbsection){
+				fbindings.push({"variable": variable, 
+						"value": myJson["subscribes"][sname]["forcedBindings"][variable]["value"],
+						"type": myJson["subscribes"][sname]["forcedBindings"][variable]["type"]})
+			    };
+
+			    // query text
+			    stext = myJson["subscribes"][sname]["sparql"];
 
 			    // get the current number of items in the grid
 			    var g = w2ui['sGrid'].records.length;	
 
 			    // add the element to the grid
 			    w2ui['sGrid'].add({recid: g+1, subscribe: sname, forcedBindings: JSON.stringify(fbindings), subscribeText: stext });
-
-			});
+			}			 			
 
 			// retrieve updates
-			$xml.find("update").each(function(){
-			    
-			    // retrieve the update
-			    var uname = $(this).attr("id");
+			for (uname in myJson["updates"]){
 
-			    // get the update text
-			    var utext = $(this).find("sparql").text();
-
-			    // retrieve the forced bindings
+			    // forced bindings
+			    fbsection = myJson["updates"][uname]["forcedBindings"];
 			    var fbindings = [];
-			    $(this).find("binding").each(function(){
-				fbindings.push({"variable":$(this).attr("variable"), "value":$(this).attr("value"), "type":$(this).attr("type")}) ;
-			    });
+			    for (variable in fbsection){
+				fbindings.push({"variable": variable, 
+						"value": myJson["updates"][uname]["forcedBindings"][variable]["value"],
+						"type": myJson["updates"][uname]["forcedBindings"][variable]["type"]});
+			    };
+
+			    // update text
+			    utext = myJson["updates"][uname]["sparql"];
 
 			    // get the current number of items in the grid
 			    var g = w2ui['uGrid'].records.length;	
 
 			    // add the element to the grid
 			    w2ui['uGrid'].add({recid: g+1, updateName: uname, forcedBindings: JSON.stringify(fbindings), updateText: utext });
+			}			 			
 
-			});			
+			// retrieve default values for hosts and ports
+			defaultHost = myJson["parameters"]["host"];
+			defaultPort = myJson["parameters"]["port"];
+			defaultScheme = myJson["parameters"]["scheme"];
+			defaultPath = myJson["parameters"]["path"];
 
-			// retrieve sepa host		   
-			$xml.find("parameters").each(function(){
+			// retrieve values for subscribe
+			if (myJson["parameters"]["subscribe"] === undefined){
+			    $('#subscribeHost').val(defaultScheme + "://" + defaultHost + ":" + defaultPort + "/" + defaultPath);
+			}
+			else {
+			    subscribeHost = myJson["parameters"]["subscribe"]["host"];
+			    if (subscribeHost === undefined)
+				subscribeHost = defaultHost;			
+			    subscribePort = myJson["parameters"]["subscribe"]["port"];
+			    if (subscribePort === undefined)
+			    subscribePort = defaultPort;			
+			    subscribePath = myJson["parameters"]["subscribe"]["path"];
+			    if (subscribePath === undefined)
+				subscribePath = defaultPath;			
+			    subscribeScheme = myJson["parameters"]["subscribe"]["scheme"];
+			    if (subscribeScheme === undefined)
+				subscribeScheme = defaultScheme;			
+			    $('#subscribeHost').val(subscribeScheme + "://" + subscribeHost + ":" + subscribePort + "/" + subscribePath);
+			};
 
-			    // retrieve prefix and namespace
-			    url = $(this).attr('url');
-			    httpport = $(this).attr('updatePort');
-			    wsport = $(this).attr('subscribePort');
-			    path = $(this).attr('path');
+			// retrieve values for update
+			if (myJson["parameters"]["update"] === undefined){
+			    $('#updateHost').val(defaultScheme + "://" + defaultHost + ":" + defaultPort + "/" + defaultPath);
+			}
+			else {
+			    updateHost = myJson["parameters"]["update"]["host"];
+			    if (updateHost === undefined)
+				updateHost = defaultHost;			
+			    updatePort = myJson["parameters"]["update"]["port"];
+			    if (updatePort === undefined)
+				updatePort = defaultPort;			
+			    updatePath = myJson["parameters"]["update"]["path"];
+			    if (updatePath === undefined)
+				updatePath = defaultPath;			
+			    updateScheme = myJson["parameters"]["update"]["scheme"];
+			    if (updateScheme === undefined)
+				updateScheme = defaultScheme;		
+			    $('#updateHost').val(updateScheme + "://" + updateHost + ":" + updatePort + "/" + updatePath);
+			}
+
+			// retrieve vaules for query
+			if (myJson["parameters"]["query"] === undefined){
+			    $('#queryHost').val(defaultScheme + "://" + defaultHost + ":" + defaultPort + "/" + defaultPath);
+			}
+			else {
+			    queryHost = myJson["parameters"]["query"]["host"];
+			    if (queryHost === undefined)
+				queryHost = defaultHost;			
+			    queryPort = myJson["parameters"]["query"]["port"];
+			    if (queryPort === undefined)
+				queryPort = defaultPort;			
+			    queryPath = myJson["parameters"]["query"]["path"];
+			    if (queryPath === undefined)
+				queryPath = defaultPath;			
+			    queryScheme = myJson["parameters"]["query"]["scheme"];
+			    if (queryScheme === undefined)
+				queryScheme = defaultScheme;		
+			    $('#queryHost').val(queryScheme + "://" + queryHost + ":" + queryPort + "/" + queryPath);
+			}
+
+			// // retrieve sepa host		   
+			// $xml.find("parameters").each(function(){
+
+			//     // retrieve prefix and namespace
+			//     url = $(this).attr('url');
+			//     httpport = $(this).attr('updatePort');
+			//     wsport = $(this).attr('subscribePort');
+			//     path = $(this).attr('path');
 			    
-			    // build http url
-			    httpUrl = "http://" + url + ":" + httpport + path;
-			    $('#updateHost').val(httpUrl);
-			    $('#queryHost').val(httpUrl);
+			//     // build http url
+			//     httpUrl = "http://" + url + ":" + httpport + path;
+			//     $('#updateHost').val(httpUrl);
+			//     $('#queryHost').val(httpUrl);
 
-			    // build ws url
-			    wsUrl = "ws://" + url + ":" + wsport + path;
-			    $('#subscribeHost').val(wsUrl);
+			//     // build ws url
+			//     wsUrl = "ws://" + url + ":" + wsport + path;
+			//     $('#subscribeHost').val(wsUrl);
 
 			    
-			});
+			// });
 
 		    };
 		    fr.readAsText(file);
