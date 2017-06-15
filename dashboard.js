@@ -734,7 +734,7 @@ $(function(){
 
 		// send subscription
 		ws.onopen = function(){
-		    ws.send("subscribe=" + wsText);
+		    ws.send(JSON.stringify({"subscribe":wsText, "alias":"-"}));
 		};
 
 		// handler for received messages
@@ -743,7 +743,7 @@ $(function(){
 		    // parse the message
 		    msg = JSON.parse(event.data);
 
-		    if ("subscribed" in msg){
+		    if (msg["subscribed"] !== undefined){
 
 		    	// get the subscription id
 		    	subid = msg["subscribed"];
@@ -776,7 +776,6 @@ $(function(){
 
 		    	// added bindings
 		    	added = msg["results"]["addedresults"];
-		    	console.log("ADDED (" + msg["notification"] + ":");	
 
 			// fill the grid
 			for (e in added["bindings"]){
@@ -784,7 +783,7 @@ $(function(){
 			    g = w2ui['abGrid'].records.length;	
 			    r = new Object;
 			    r["recid"] = g+1;
-			    r["subid"] = msg["notification"];			    
+			    r["subid"] = msg["spuid"];			    
 			    for (k in added["bindings"][e]){
 				r[k] = added["bindings"][e][k]["value"];
 			    }
@@ -793,7 +792,6 @@ $(function(){
 			
 		    	// removed bindings
 		    	removed = msg["results"]["removedresults"];			
-		    	console.log("REMOVED (" + msg["notification"] + ":");
 
 			// fill the grid
 			for (e in removed["bindings"]){
@@ -801,7 +799,7 @@ $(function(){
 			    g = w2ui['rbGrid'].records.length;	
 			    r = new Object;
 			    r["recid"] = g+1;
-			    r["subid"] = msg["notification"];			    
+			    r["subid"] = msg["spuid"];			    
 			    for (k in removed["bindings"][e]){
 				r[k] = removed["bindings"][e][k]["value"];
 			    }
@@ -821,6 +819,10 @@ $(function(){
 		// get selected subscription
 		subid = $("#activeSubs").data("selected")["id"];
 		if (typeof(subid) !== "undefined"){
+
+		    // retrieve the websocket
+		    ws = subscriptions[subid];
+		    ws.close();
 
 		    // remove the sub from the dropdown list
 		    items = [];
