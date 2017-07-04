@@ -209,71 +209,22 @@ $(function(){
 			    w2ui['uGrid'].add({recid: g+1, updateName: uname, forcedBindings: JSON.stringify(fbindings), updateText: utext });
 			}			 			
 
-			// retrieve default values for hosts and ports
-			defaultHost = myJson["parameters"]["host"];
-			defaultPort = myJson["parameters"]["port"];
-			defaultScheme = myJson["parameters"]["scheme"];
-			defaultPath = myJson["parameters"]["path"];
+			// retrieve host
+			host = myJson["parameters"]["host"];
+
+			// retrieve ports
+			subscribePort = myJson["parameters"]["ports"]["ws"];
+			updatequeryPort = myJson["parameters"]["ports"]["http"];
+
+			// retrieve paths
+			subscribePath = myJson["parameters"]["paths"]["subscribe"];
+			updatePath = myJson["parameters"]["paths"]["update"];
+			queryPath = myJson["parameters"]["paths"]["query"];
 
 			// retrieve values for subscribe
-			if (myJson["parameters"]["subscribe"] === undefined){
-			    $('#subscribeHost').val(defaultScheme + "://" + defaultHost + ":" + defaultPort + "/" + defaultPath);
-			}
-			else {
-			    subscribeHost = myJson["parameters"]["subscribe"]["host"];
-			    if (subscribeHost === undefined)
-				subscribeHost = defaultHost;			
-			    subscribePort = myJson["parameters"]["subscribe"]["port"];
-			    if (subscribePort === undefined)
-			    subscribePort = defaultPort;			
-			    subscribePath = myJson["parameters"]["subscribe"]["path"];
-			    if (subscribePath === undefined)
-				subscribePath = defaultPath;			
-			    subscribeScheme = myJson["parameters"]["subscribe"]["scheme"];
-			    if (subscribeScheme === undefined)
-				subscribeScheme = defaultScheme;			
-			    $('#subscribeHost').val(subscribeScheme + "://" + subscribeHost + ":" + subscribePort + "/" + subscribePath);
-			};
-
-			// retrieve values for update
-			if (myJson["parameters"]["update"] === undefined){
-			    $('#updateHost').val(defaultScheme + "://" + defaultHost + ":" + defaultPort + "/" + defaultPath);
-			}
-			else {
-			    updateHost = myJson["parameters"]["update"]["host"];
-			    if (updateHost === undefined)
-				updateHost = defaultHost;			
-			    updatePort = myJson["parameters"]["update"]["port"];
-			    if (updatePort === undefined)
-				updatePort = defaultPort;			
-			    updatePath = myJson["parameters"]["update"]["path"];
-			    if (updatePath === undefined)
-				updatePath = defaultPath;			
-			    updateScheme = myJson["parameters"]["update"]["scheme"];
-			    if (updateScheme === undefined)
-				updateScheme = defaultScheme;		
-			    $('#updateHost').val(updateScheme + "://" + updateHost + ":" + updatePort + "/" + updatePath);
-			}
-
-			// retrieve vaules for query
-			if (myJson["parameters"]["query"] === undefined){
-			    $('#queryHost').val(defaultScheme + "://" + defaultHost + ":" + defaultPort + "/" + defaultPath);
-			}
-			else {
-			    queryHost = myJson["parameters"]["query"]["host"];
-			    if (queryHost === undefined)
-				queryHost = defaultHost;			
-			    queryPort = myJson["parameters"]["query"]["port"];
-			    if (queryPort === undefined)
-				queryPort = defaultPort;			
-			    queryPath = myJson["parameters"]["query"]["path"];
-			    if (queryPath === undefined)
-				queryPath = defaultPath;			
-			    queryScheme = myJson["parameters"]["query"]["scheme"];
-			    if (queryScheme === undefined)
-				queryScheme = defaultScheme;		
-			    $('#queryHost').val(queryScheme + "://" + queryHost + ":" + queryPort + "/" + queryPath);
-			}
+			$('#subscribeHost').val("ws://" + host + ":" + subscribePort + "/" + subscribePath);
+			$('#updateHost').val("http://" + host + ":" + updatequeryPort + "/" + updatePath);
+			$('#queryHost').val("http://" + host + ":" + updatequeryPort + "/" + queryPath);
 
 			// // retrieve sepa host		   
 			// $xml.find("parameters").each(function(){
